@@ -212,7 +212,7 @@ def main():
 
 	startMenu()
 
-	cursor.execute("DELETE FROM Campaigns where id = 'C7' or id = 'C8'")
+	#cursor.execute("DELETE FROM Campaigns where id = 'C7' or id = 'C8'")
 
 	dbconn.commit()
 	
