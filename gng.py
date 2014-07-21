@@ -2,7 +2,6 @@
 
 import psycopg2
 
-#add globals here - cursor, connection
 dbconn = psycopg2.connect(host='studentdb.csc.uvic.ca', user='c370_s09', password = 'o4OXQtB5')
 cursor = dbconn.cursor()
 
