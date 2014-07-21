@@ -2,8 +2,12 @@
 
 import psycopg2
 
+#global variables
 dbconn = psycopg2.connect(host='studentdb.csc.uvic.ca', user='c370_s09', password = 'o4OXQtB5')
 cursor = dbconn.cursor()
+
+#class constants
+num_choices = 11
 
 #git comment
 
@@ -16,7 +20,7 @@ class Campaign:
 		self.end_date = end_date
 
 	def insertCampaign(self):
-		cursor.execute("INSERT INTO Campaigns (id, name, startDate, endDate) VALUES (%s, %s, %s, %s)", ("C7", self.name, self.start_date, self.end_date))
+		cursor.execute("INSERT INTO Campaigns (id, name, startDate, endDate) VALUES (%s, %s, %s, %s)", ("C9", self.name, self.start_date, self.end_date))
 
 	def insertManager(self):
 		#get campaign id#		
@@ -52,27 +56,27 @@ def startMenu():
 	print main_menu_use_choice
 
 	if (main_menu_use_choice == str(1)):
-		menu1(cursor)
+		menu1()
 		
 	elif (main_menu_use_choice == str(2)):
 		print 'menu2'		
-		menu2(cursor)	
+		menu2()	
 
 	elif (main_menu_use_choice == str(3)):
-		menu3(cursor)
+		menu3()
 
 	elif (main_menu_use_choice == str(4)):
-		menu4(cursor)	
+		menu4()	
 
 	elif (main_menu_use_choice == str(5)):
-		menu5(cursor)	
+		menu5()	
 	
 	#if choice not in range, give user three chances to correct.  If not properly entered, terminate program.
 	else: 
 		print 'Entered value out of range - returning to main.'
 	return
 
-def menu1(cursor):
+def menu1():
 		
 	intro_str = """Please select a query from the following list: \n
 	Query menu: \n
@@ -90,11 +94,8 @@ def menu1(cursor):
 	  
 	Please enter your selection (a number between 1 and 11):\n	
 	"""	
-	
-	#num_choices should be class constant
-	num_choices = 11	
+		
 	menu1_use_choice = raw_input(intro_str)
-	#print menu1_use_choice
 
 	if(menu1_use_choice.isdigit()):
 		menu_value = int(menu1_use_choice)
@@ -129,7 +130,7 @@ def menu1(cursor):
 		return
 		
 
-def menu2(cursor):
+def menu2():
 	intro_str = """\tTo create a new campaign, you will need to enter
 	data for the several data fields. \n
 	To prevent errors, please enter data in accord 
@@ -153,7 +154,13 @@ def menu2(cursor):
 	campaign = Campaign(campaign_name, start_date, end_date)
 
 	campaign.insertCampaign()
+	#cursor.execute('select * from Campaigns where campaign_name = %s', campaign.name)
+	#cursor.execute('select * from Campaigns where name = "Steve"')
 	cursor.execute('select * from Campaigns')
+
+	#display to user
+	#any changes?  if so, which fields?  if not, commit
+	print "You have entered the follwing information: \n"
 	
 	for row in cursor.fetchall():		
 		row_tuple = '\t'				
@@ -162,8 +169,18 @@ def menu2(cursor):
 			row_tuple += '%s\t' %element					
 		print row_tuple	
 
-	campaign.insertManager()
-	cursor.execute('select * from Manages')
+	campaign_review_string = "Is this information correct (yes/no) ?"
+	campaign_review_choice = raw_input(campaign_review_string)
+	if (campaign_review_choice == 'yes'):
+		print 'yes'
+	elif(campaign_review_choice == 'no'):
+		print 'no'
+	else:
+		print 'Improper input - return to main'
+		return 
+
+	#campaign.insertManager()
+	#cursor.execute('select * from Manages')
 	
 	#allow user to review table information
 	#allow user to edit table information?
@@ -175,13 +192,13 @@ def menu2(cursor):
 	volunteer_str = 'Add volunteer for campaign (e.g. "Vladimir Putin"): \n'
 	volunteer = raw_input(volunteer_str)
 	
-def menu3(cursor):
+def menu3():
 	print menu3
 
-def menu4(cursor):
+def menu4():
 	print menu4
 
-def menu5(cursor):
+def menu5():
 	print menu5
 
 def main():
@@ -190,13 +207,10 @@ def main():
 	#user inputs selection
 	#based on input, direct user to new menu
 
-	dbconn = psycopg2.connect(host='studentdb.csc.uvic.ca', user='c370_s09', password = 'o4OXQtB5')
-	cursor = dbconn.cursor()
+	#dbconn = psycopg2.connect(host='studentdb.csc.uvic.ca', user='c370_s09', password = 'o4OXQtB5')
+	#cursor = dbconn.cursor()
 
-	#startMenu(cursor)
 	startMenu()
-
-	#cursor.execute("INSERT INTO Campaigns (id, name, startDate, endDate) VALUES ('C8', 'Steve', '2014-01-05', '2014-02-05')")
 
 	cursor.execute("DELETE FROM Campaigns where id = 'C7' or id = 'C8'")
 
