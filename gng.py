@@ -6,6 +6,8 @@ import psycopg2
 dbconn = psycopg2.connect(host='studentdb.csc.uvic.ca', user='c370_s09', password = 'o4OXQtB5')
 cursor = dbconn.cursor()
 
+#git comment
+
 class Campaign:
 	'Base class for all campaigns'
 	
@@ -195,13 +197,19 @@ def main():
 	#startMenu(cursor)
 	startMenu()
 
+	#cursor.execute("INSERT INTO Campaigns (id, name, startDate, endDate) VALUES ('C8', 'Steve', '2014-01-05', '2014-02-05')")
+
+	cursor.execute("DELETE FROM Campaigns where id = 'C7' or id = 'C8'")
+
+	dbconn.commit()
+	
 	cursor.execute("""
 	select *
 	from Campaigns
 	""")
 
-	#for row in cursor.fetchall():
-		#print "%s %s %s" % (row[0], row[1], row[2])
+	for row in cursor.fetchall():
+		print "%s %s %s" % (row[0], row[1], row[2])
 
 	cursor.close()
 	dbconn.close()
