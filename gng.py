@@ -20,7 +20,7 @@ class Campaign:
 		self.end_date = end_date
 
 	def insertCampaign(self):
-		cursor.execute("INSERT INTO Campaigns (id, name, startDate, endDate) VALUES (%s, %s, %s, %s)", ("C9", self.name, self.start_date, self.end_date))
+		cursor.execute("INSERT INTO Campaigns (id, name, startDate, endDate) VALUES (%s, %s, %s, %s)", ("C12", self.name, self.start_date, self.end_date))
 
 	def insertManager(self):
 		#get campaign id#		
@@ -156,7 +156,8 @@ def menu2():
 	campaign.insertCampaign()
 	#cursor.execute('select * from Campaigns where campaign_name = %s', campaign.name)
 	#cursor.execute('select * from Campaigns where name = "Steve"')
-	cursor.execute('select * from Campaigns')
+	#***Review this line***
+	cursor.execute("select * from Campaigns where name=%s" %campaign.name)
 
 	#display to user
 	#any changes?  if so, which fields?  if not, commit
@@ -169,7 +170,7 @@ def menu2():
 			row_tuple += '%s\t' %element					
 		print row_tuple	
 
-	campaign_review_string = "Is this information correct (yes/no) ?"
+	campaign_review_string = "Is this information correct (yes/no) ?\n"
 	campaign_review_choice = raw_input(campaign_review_string)
 	if (campaign_review_choice == 'yes'):
 		print 'yes'
