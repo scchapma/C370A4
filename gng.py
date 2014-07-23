@@ -85,7 +85,7 @@ def printReport(header, rows):
 		print row_str	
 	print '\n'
 	return 
-	
+
 def startMenu():
 		
 	os.system('clear')
@@ -139,7 +139,7 @@ def startMenu():
 
 def menu1():
 		
-	os.system('clear')
+	#os.system('clear')
 
 	intro_str = """\tPlease select a query from the following list: \n
 	Query menu: \n
@@ -158,61 +158,76 @@ def menu1():
 	Please enter your selection (a number between 1 and 11):\n	
 	"""	
 		
-	menu1_use_choice = raw_input(intro_str)
-	input_flag = True
+	#Initially set to true - set to false if user does not desire additional queries
+	query_flag = True
+	while (query_flag):		
 
-	while (input_flag):
+		os.system('clear')
+		menu1_use_choice = raw_input(intro_str)
+		input_flag = True
 
-		if(menu1_use_choice.isdigit()):
-			menu_value = int(menu1_use_choice)
-			if (menu_value == 0):
-				return
-			elif (menu_value < 1 or menu_value> num_choices):
-				error_str = """\n\tInteger entered out of range: \n
+		while (input_flag):
+
+			if(menu1_use_choice.isdigit()):
+				menu_value = int(menu1_use_choice)
+				if (menu_value == 0):
+					return
+				elif (menu_value < 1 or menu_value> num_choices):
+					error_str = """\n\tInteger entered out of range: \n
+	Please enter a number between 1 and 11 or enter '0' to exit.\n
+	"""
+					menu1_use_choice = raw_input(error_str)
+
+				else:
+					
+					os.system('clear')
+
+					print "\n\tData for query %s:\n " %menu1_use_choice
+					cursor.execute('select * from question%s' %menu1_use_choice)
+					rows = cursor.fetchall()
+					header = []
+					#what if rows = 0?
+					for x in range(0, len(rows[0])):
+						header.append(cursor.description[x].name)
+					printReport(header, rows)
+					input_flag = False
+
+					#check to see if user wants to return to query menu
+					query_str = '\tDo you want to return to the query menu? (y/n)\n'
+					query_choice = raw_input(query_str)
+
+					if query_choice == 'y':
+						dummy_str = ''
+					else:
+						query_flag = False
+						return
+					
+					#row_number = 0			
+					# check to ensure that this works when result is empty (i.e., # rows = 0)
+					# needs to set up column headers to be in right place - get len of 			
+					#for row in cursor.fetchall():
+					#	row_header = '\t'	
+					#	count = 0			
+					#	# print header for first row only				
+					#	if(row_number == 0):				
+					#		for element in row:				
+					#			row_header += '%s\t' %cursor.description[count].name
+					#		print row_header
+					#		row_number += 1
+					#	row_tuple = '\t'				
+					#	for element in row:				
+					#		row_tuple += '%s|\t' %element					
+					#	#print ascii black block - ASCII number 178 or 219
+					#	row_tuple += chr(35)
+					#	row_tuple += '\n'
+					#	print row_tuple	
+					#	input_flag = False
+
+			else:
+				error_str = """\n\tMalformed input: \n
 	Please enter a number between 1 and 11 or enter '0' to exit.\n
 	"""
 				menu1_use_choice = raw_input(error_str)
-
-			else:
-				
-				os.system('clear')
-
-				print "\n\tData for query %s:\n " %menu1_use_choice
-				cursor.execute('select * from question%s' %menu1_use_choice)
-				rows = cursor.fetchall()
-				header = []
-				#what if rows = 0?
-				for x in range(0, len(rows[0])):
-					header.append(cursor.description[x].name)
-				printReport(header, rows)
-				input_flag = False
-				
-				#row_number = 0			
-				# check to ensure that this works when result is empty (i.e., # rows = 0)
-				# needs to set up column headers to be in right place - get len of 			
-				#for row in cursor.fetchall():
-				#	row_header = '\t'	
-				#	count = 0			
-				#	# print header for first row only				
-				#	if(row_number == 0):				
-				#		for element in row:				
-				#			row_header += '%s\t' %cursor.description[count].name
-				#		print row_header
-				#		row_number += 1
-				#	row_tuple = '\t'				
-				#	for element in row:				
-				#		row_tuple += '%s|\t' %element					
-				#	#print ascii black block - ASCII number 178 or 219
-				#	row_tuple += chr(35)
-				#	row_tuple += '\n'
-				#	print row_tuple	
-				#	input_flag = False
-
-		else:
-			error_str = """\n\tMalformed input: \n
-	Please enter a number between 1 and 11 or enter '0' to exit.\n
-	"""
-			menu1_use_choice = raw_input(error_str)
 
 	return
 		
