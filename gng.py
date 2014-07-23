@@ -83,7 +83,9 @@ def printReport(header, rows):
 		#delete last char
 		row_str = row_str[:-1]
 		print row_str	
-
+	print '\n'
+	return 
+	
 def startMenu():
 		
 	os.system('clear')
@@ -304,11 +306,6 @@ def testGraph():
 
 def main():
 	
-	#header = ['name', 'address']
-	#rows = [('Joe', 'Main Street'), ('Steve', 'Cedar Street')]
-
-	#printReport(header, rows)
-
 	startMenu()
 
 	dbconn.commit()
