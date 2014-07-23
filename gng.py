@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
 import psycopg2
+import os
+import sys
+#from ascii_graph import Pyasciigraph
 
 #global variables
 dbconn = psycopg2.connect(host='studentdb.csc.uvic.ca', user='c370_s09', password = 'o4OXQtB5')
@@ -40,10 +43,26 @@ class Campaign:
 	def printLongReport(self):
 		return
 
-#def startMenu(cursor):
+#print report
+#input: list of rows, list of header fields
+def printReport(header, rows):
+	#prepare list with baseline widths for header fields
+	col_widths = []
+	for item in header:
+		col_widths.append(len(item))
+	print col_widths	
+	#traverse each column of table to determine max length of table items
+	#set header width to max of baseline header field and max length of columns
+	#center each header within header width
+	#print header
+	#print divider
+	#print columns
+
 def startMenu():
 		
-	intro_str = """Welcome to the GnG database: \n
+	os.system('clear')
+
+	intro_str = """\n\tWelcome to the GnG database: \n
 	Main menu: \n
 	1.  Pre-set database queries
 	2.  Set up new campaign
@@ -52,33 +71,49 @@ def startMenu():
 	5.  Phase 5 - *under development*\n  
 	Please enter your selection (a number between 1 and 5):\n	
 	"""	
-	main_menu_use_choice = raw_input(intro_str)
-	print main_menu_use_choice
-
-	if (main_menu_use_choice == str(1)):
-		menu1()
-		
-	elif (main_menu_use_choice == str(2)):
-		print 'menu2'		
-		menu2()	
-
-	elif (main_menu_use_choice == str(3)):
-		menu3()
-
-	elif (main_menu_use_choice == str(4)):
-		menu4()	
-
-	elif (main_menu_use_choice == str(5)):
-		menu5()	
 	
-	#if choice not in range, give user three chances to correct.  If not properly entered, terminate program.
-	else: 
-		print 'Entered value out of range - returning to main.'
+	main_menu_use_choice = raw_input(intro_str)
+	input_flag = True
+
+	while (input_flag):
+
+		if (main_menu_use_choice == str(0)):
+			return
+
+		elif (main_menu_use_choice == str(1)):
+			menu1()
+			input_flag = False
+			
+		elif (main_menu_use_choice == str(2)):
+			os.system('clear')		
+			menu2()	
+			input_flag = False
+
+		elif (main_menu_use_choice == str(3)):
+			menu3()
+			input_flag = False
+
+		elif (main_menu_use_choice == str(4)):
+			menu4()	
+			input_flag = False
+
+		elif (main_menu_use_choice == str(5)):
+			menu5()	
+			input_flag = False
+	
+		else: 
+			error_str = """\n\tEntered value out of range: \n
+	Please enter a number between 1 and 5 or enter '0' to exit.\n
+	"""
+			main_menu_use_choice = raw_input(error_str)
+	
 	return
 
 def menu1():
 		
-	intro_str = """Please select a query from the following list: \n
+	os.system('clear')
+
+	intro_str = """\tPlease select a query from the following list: \n
 	Query menu: \n
 	1.   What employees and volunteers work on any campaign managed by Barry Basil (#E2)?
 	2.   What employees manage the campaigns that Gary Gold (#V1) works on?
@@ -96,38 +131,56 @@ def menu1():
 	"""	
 		
 	menu1_use_choice = raw_input(intro_str)
+	input_flag = True
 
-	if(menu1_use_choice.isdigit()):
-		menu_value = int(menu1_use_choice)
-		if (menu_value < 1 or menu_value> num_choices):
-			print "Integer entered, out of range - return to main"
-			return
-		else:
-			
-			print "\n\tData for query %s:\n " %menu1_use_choice
-			cursor.execute('select * from question%s' %menu1_use_choice)
-			
-			row_number = 0			
-			# check to ensure that this works when result is empty (i.e., # rows = 0)
-			# needs to set up column headers to be in right place - get len of 			
-			for row in cursor.fetchall():
-				row_header = '\t'	
-				count = 0			
-				# print header for first row only				
-				if(row_number == 0):				
+	while (input_flag):
+
+		if(menu1_use_choice.isdigit()):
+			menu_value = int(menu1_use_choice)
+			if (menu_value == 0):
+				return
+			elif (menu_value < 1 or menu_value> num_choices):
+				error_str = """\n\tInteger entered out of range: \n
+	Please enter a number between 1 and 11 or enter '0' to exit.\n
+	"""
+				menu1_use_choice = raw_input(error_str)
+
+			else:
+				
+				os.system('clear')
+
+				print "\n\tData for query %s:\n " %menu1_use_choice
+				cursor.execute('select * from question%s' %menu1_use_choice)
+				
+				row_number = 0			
+				# check to ensure that this works when result is empty (i.e., # rows = 0)
+				# needs to set up column headers to be in right place - get len of 			
+				for row in cursor.fetchall():
+					row_header = '\t'	
+					count = 0			
+					# print header for first row only				
+					if(row_number == 0):				
+						for element in row:				
+							row_header += '%s\t' %cursor.description[count].name
+							count += 1
+						print row_header
+						row_number += 1
+					row_tuple = '\t'				
 					for element in row:				
-						row_header += '%s\t' %cursor.description[count].name
-						count += 1
-					print row_header
-					row_number += 1
-				row_tuple = '\t'				
-				for element in row:				
-					row_tuple += '%s|\t' %element					
-				print row_tuple	
+						row_tuple += '%s|\t' %element					
+					#print ascii black block - ASCII number 178 or 219
+					row_tuple += chr(35)
+					row_tuple += '\n'
+					print row_tuple	
+					input_flag = False
 
-	else:
-		print "Malformed input - return to main"
-		return
+		else:
+			error_str = """\n\tMalformed input: \n
+	Please enter a number between 1 and 11 or enter '0' to exit.\n
+	"""
+			menu1_use_choice = raw_input(error_str)
+
+	return
 		
 
 def menu2():
@@ -157,7 +210,7 @@ def menu2():
 	#cursor.execute('select * from Campaigns where campaign_name = %s', campaign.name)
 	#cursor.execute('select * from Campaigns where name = "Steve"')
 	#***Review this line***
-	cursor.execute("select * from Campaigns where name=%s" %campaign.name)
+	cursor.execute("select * from Campaigns")
 
 	#display to user
 	#any changes?  if so, which fields?  if not, commit
@@ -202,28 +255,38 @@ def menu4():
 def menu5():
 	print menu5
 
+def testGraph():
+
+	cursor.execute("""
+	select *
+	from Expenses 
+	""")
+
+	expenses = []
+	for row in cursor.fetchall():
+		expenses.append(row[3], row[1])
+
+	graph = Pyasciigraph()
+	for line in  graph.graph('Expenses', expenses):
+   		print(line)
+
 def main():
 	
-	#output menu to user
-	#user inputs selection
-	#based on input, direct user to new menu
-
-	#dbconn = psycopg2.connect(host='studentdb.csc.uvic.ca', user='c370_s09', password = 'o4OXQtB5')
-	#cursor = dbconn.cursor()
-
 	startMenu()
 
 	#cursor.execute("DELETE FROM Campaigns where id = 'C7' or id = 'C8'")
 
 	dbconn.commit()
-	
-	cursor.execute("""
-	select *
-	from Campaigns
-	""")
 
-	for row in cursor.fetchall():
-		print "%s %s %s" % (row[0], row[1], row[2])
+	#testGraph()
+	
+	#cursor.execute("""
+	#select *
+	#from Campaigns
+	#""")	
+
+	#for row in cursor.fetchall():
+		#print "%s %s %s" % (row[0], row[1], row[2])
 
 	cursor.close()
 	dbconn.close()
