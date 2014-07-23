@@ -46,17 +46,43 @@ class Campaign:
 #print report
 #input: list of rows, list of header fields
 def printReport(header, rows):
+	
 	#prepare list with baseline widths for header fields
 	col_widths = []
 	for item in header:
 		col_widths.append(len(item))
-	print col_widths	
+	
 	#traverse each column of table to determine max length of table items
-	#set header width to max of baseline header field and max length of columns
-	#center each header within header width
+	for x in range(0, len(header)):
+		for r in rows:
+			
+			#set header width to max of baseline header field and max length of columns
+			if len(str(r[x])) > col_widths[x]:
+				col_widths[x] = len(str(r[x]))
+
 	#print header
+	header_str = ''
+	count = 0
+	for x in range(0, len(col_widths)):
+		#center each header within header width	
+		header_str += header[x].center(col_widths[x])
+		header_str += '|'
+	#delete last char
+	header_str = header_str[:-1]
+	print header_str
+	
 	#print divider
-	#print columns
+	print '-'*len(header_str)	
+	
+	#print rows
+	for r in rows:
+		row_str = ''
+		for x in range(0, len(col_widths)):
+			row_str += str(r[x]).ljust(col_widths[x])
+			row_str += '|'
+		#delete last char
+		row_str = row_str[:-1]
+		print row_str	
 
 def startMenu():
 		
@@ -151,28 +177,34 @@ def menu1():
 
 				print "\n\tData for query %s:\n " %menu1_use_choice
 				cursor.execute('select * from question%s' %menu1_use_choice)
+				rows = cursor.fetchall()
+				header = []
+				#what if rows = 0?
+				for x in range(0, len(rows[0])):
+					header.append(cursor.description[x].name)
+				printReport(header, rows)
+				input_flag = False
 				
-				row_number = 0			
+				#row_number = 0			
 				# check to ensure that this works when result is empty (i.e., # rows = 0)
 				# needs to set up column headers to be in right place - get len of 			
-				for row in cursor.fetchall():
-					row_header = '\t'	
-					count = 0			
-					# print header for first row only				
-					if(row_number == 0):				
-						for element in row:				
-							row_header += '%s\t' %cursor.description[count].name
-							count += 1
-						print row_header
-						row_number += 1
-					row_tuple = '\t'				
-					for element in row:				
-						row_tuple += '%s|\t' %element					
-					#print ascii black block - ASCII number 178 or 219
-					row_tuple += chr(35)
-					row_tuple += '\n'
-					print row_tuple	
-					input_flag = False
+				#for row in cursor.fetchall():
+				#	row_header = '\t'	
+				#	count = 0			
+				#	# print header for first row only				
+				#	if(row_number == 0):				
+				#		for element in row:				
+				#			row_header += '%s\t' %cursor.description[count].name
+				#		print row_header
+				#		row_number += 1
+				#	row_tuple = '\t'				
+				#	for element in row:				
+				#		row_tuple += '%s|\t' %element					
+				#	#print ascii black block - ASCII number 178 or 219
+				#	row_tuple += chr(35)
+				#	row_tuple += '\n'
+				#	print row_tuple	
+				#	input_flag = False
 
 		else:
 			error_str = """\n\tMalformed input: \n
@@ -272,21 +304,14 @@ def testGraph():
 
 def main():
 	
+	#header = ['name', 'address']
+	#rows = [('Joe', 'Main Street'), ('Steve', 'Cedar Street')]
+
+	#printReport(header, rows)
+
 	startMenu()
 
-	#cursor.execute("DELETE FROM Campaigns where id = 'C7' or id = 'C8'")
-
 	dbconn.commit()
-
-	#testGraph()
-	
-	#cursor.execute("""
-	#select *
-	#from Campaigns
-	#""")	
-
-	#for row in cursor.fetchall():
-		#print "%s %s %s" % (row[0], row[1], row[2])
 
 	cursor.close()
 	dbconn.close()
