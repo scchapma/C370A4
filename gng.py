@@ -23,24 +23,24 @@ class Campaign:
 		self.end_date = end_date
 
 	def insertCampaign(self):
+		#insert try/catch
 		cursor.execute("INSERT INTO Campaigns (id, name, startDate, endDate) VALUES (%s, %s, %s, %s)", ("C13", self.name, self.start_date, self.end_date))
 
-	def insertManager(self):
-		#get campaign id#		
-		#get manager's employee number or report invalid		
-		cursor.execute("INSERT INTO Manages (campaign, employee) VALUES (%s, %s)", ("C7", "E1"))	
+	def insertManager(self, campaign_id, employee_id):
+		#get campaign id#	
+		#get manager's employee number or report invalid
+		#insert try/catch
+
+		cursor.execute("INSERT INTO Manages (campaign, employee) VALUES (%s, %s)", (campaign_id, employee_id))
+		cursor.execute("select * from Manages where campaign='%s'" %campaign_id)
+		dbconn.commit()
+		
 		return
 
 	def insertNewVolunteer(self, volunteer):
 		return
 
 	def insertVolunteer(self, volunteer):
-		return
-
-	def printShortReport(self):
-		return
-
-	def printLongReport(self):
 		return
 
 #print report
@@ -233,6 +233,7 @@ def menu2():
 
 	campaign = Campaign(campaign_name, start_date, end_date)
 
+	###need try/catch here in case Date (or other field) not properly formed###
 	campaign.insertCampaign()
 	cursor.execute("select * from Campaigns where name='%s'" %campaign.name)
 
@@ -246,13 +247,16 @@ def menu2():
 	print "\n\tYou have entered the following information: \n"
 	printReport(header, rows)
 
+	id_str = ''
 	review_flag = True
+	
 	while (review_flag):
-		#any changes?  if so, which fields?  if not, commit
+		#allow user to accept or reject campaign before commit
 		campaign_review_string = "\n\tIs this information correct (y/n) ?\n\n\t"
 		campaign_review_choice = raw_input(campaign_review_string)
 		
 		if (campaign_review_choice == 'y'):
+			id_str = str(rows[0][0])
 			dbconn.commit()
 			print '\n\tChanges committed.\n'
 			review_flag = False
@@ -269,9 +273,39 @@ def menu2():
 	#allow user to review table information
 	#allow user to edit table information?
 
-	manager_str = 'Enter manager for campaign (e.g. "Vladimir Putin"): \n'
-	manager = raw_input(manager_str)
+	manager_str = """
+	The campaign manager must be entered by employee number.
+	For instance, for Amy Arugula, you would enter 'E1'.
+
+	Please enter employee number: \n
+	"""
+	manager_emp_id = raw_input(manager_str)
+	campaign.insertManager(id_str, manager_emp_id)
 	#check for proper format and that manager is an employee
+
+	#confirm that manager correct
+	cursor.execute("select name from Employees, Manages where id=employee and campaign='%s'" %id_str)
+	manager_str = cursor.fetchall()
+	print 'Campaign manager: %s' %manager_str[0]
+
+	manager_review_flag = True
+
+	while (manager_review_flag):
+		#allow user to accept or reject campaign before commit
+		manager_review_string = "\n\tIs this information correct (y/n) ?\n\n\t"
+		manager_review_choice = raw_input(manager_review_string)
+		
+		if (manager_review_choice == 'y'):
+			dbconn.commit()
+			print '\n\tChanges committed.\n'
+			manager_review_flag = False
+		elif(manager_review_choice == 'n'):
+			dbconn.rollback()
+			print '\n\tManager deleted - please start again.\n'
+			return
+		else:
+			print '\n\tImproper input - Manager not saved.\n'
+
 
 	volunteer_str = 'Add volunteer for campaign (e.g. "Vladimir Putin"): \n'
 	volunteer = raw_input(volunteer_str)
