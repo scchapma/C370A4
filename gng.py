@@ -23,7 +23,7 @@ class Campaign:
 		self.end_date = end_date
 
 	def insertCampaign(self):
-		cursor.execute("INSERT INTO Campaigns (id, name, startDate, endDate) VALUES (%s, %s, %s, %s)", ("C12", self.name, self.start_date, self.end_date))
+		cursor.execute("INSERT INTO Campaigns (id, name, startDate, endDate) VALUES (%s, %s, %s, %s)", ("C13", self.name, self.start_date, self.end_date))
 
 	def insertManager(self):
 		#get campaign id#		
@@ -138,8 +138,6 @@ def startMenu():
 	return
 
 def menu1():
-		
-	#os.system('clear')
 
 	intro_str = """\tPlease select a query from the following list: \n
 	Query menu: \n
@@ -170,8 +168,10 @@ def menu1():
 
 			if(menu1_use_choice.isdigit()):
 				menu_value = int(menu1_use_choice)
+				
 				if (menu_value == 0):
 					return
+				
 				elif (menu_value < 1 or menu_value> num_choices):
 					error_str = """\n\tInteger entered out of range: \n
 	Please enter a number between 1 and 11 or enter '0' to exit.\n
@@ -201,28 +201,6 @@ def menu1():
 					else:
 						query_flag = False
 						return
-					
-					#row_number = 0			
-					# check to ensure that this works when result is empty (i.e., # rows = 0)
-					# needs to set up column headers to be in right place - get len of 			
-					#for row in cursor.fetchall():
-					#	row_header = '\t'	
-					#	count = 0			
-					#	# print header for first row only				
-					#	if(row_number == 0):				
-					#		for element in row:				
-					#			row_header += '%s\t' %cursor.description[count].name
-					#		print row_header
-					#		row_number += 1
-					#	row_tuple = '\t'				
-					#	for element in row:				
-					#		row_tuple += '%s|\t' %element					
-					#	#print ascii black block - ASCII number 178 or 219
-					#	row_tuple += chr(35)
-					#	row_tuple += '\n'
-					#	print row_tuple	
-					#	input_flag = False
-
 			else:
 				error_str = """\n\tMalformed input: \n
 	Please enter a number between 1 and 11 or enter '0' to exit.\n
@@ -234,7 +212,7 @@ def menu1():
 
 def menu2():
 	intro_str = """\tTo create a new campaign, you will need to enter
-	data for the several data fields. \n
+	data for several data fields. \n
 	To prevent errors, please enter data in accord 
 	with the format provided for each field.
 	
@@ -245,42 +223,45 @@ def menu2():
 		print '\n\t***Campaign name length out of limits - return to main***\n'
 		return
 	
-	start_date_str = 'Enter campaign start date (YYYY-MM-DD): \n'
+	start_date_str = '\n\t2.  Enter campaign start date (YYYY-MM-DD): \n\n\t'
 	start_date = raw_input(start_date_str) 
 	#check for proper format
 
-	end_date_str = 'Enter campaign end date (YYYY-MM-DD): \n'
+	end_date_str = '\n\t3.  Enter campaign end date (YYYY-MM-DD): \n\n\t'
 	end_date = raw_input(end_date_str)
 	#check for proper format
 
 	campaign = Campaign(campaign_name, start_date, end_date)
 
 	campaign.insertCampaign()
-	#cursor.execute('select * from Campaigns where campaign_name = %s', campaign.name)
-	#cursor.execute('select * from Campaigns where name = "Steve"')
-	#***Review this line***
-	cursor.execute("select * from Campaigns")
+	cursor.execute("select * from Campaigns where name='%s'" %campaign.name)
 
-	#display to user
-	#any changes?  if so, which fields?  if not, commit
-	print "You have entered the follwing information: \n"
+	rows = cursor.fetchall()
+	header = []
+	#what if rows = 0?
+	for x in range(0, len(rows[0])):
+		header.append(cursor.description[x].name)
 	
-	for row in cursor.fetchall():		
-		row_tuple = '\t'				
-		for element in row:				
-			#print "%s %s %s" % (row[0], row[1], row[2])				
-			row_tuple += '%s\t' %element					
-		print row_tuple	
+	#display input to user
+	print "\n\tYou have entered the following information: \n"
+	printReport(header, rows)
 
-	campaign_review_string = "Is this information correct (yes/no) ?\n"
-	campaign_review_choice = raw_input(campaign_review_string)
-	if (campaign_review_choice == 'yes'):
-		print 'yes'
-	elif(campaign_review_choice == 'no'):
-		print 'no'
-	else:
-		print 'Improper input - return to main'
-		return 
+	review_flag = True
+	while (review_flag):
+		#any changes?  if so, which fields?  if not, commit
+		campaign_review_string = "\n\tIs this information correct (y/n) ?\n\n\t"
+		campaign_review_choice = raw_input(campaign_review_string)
+		
+		if (campaign_review_choice == 'y'):
+			dbconn.commit()
+			print '\n\tChanges committed.\n'
+			review_flag = False
+		elif(campaign_review_choice == 'n'):
+			dbconn.rollback()
+			print '\n\tCampaign deleted - please start again.\n'
+			return
+		else:
+			print '\n\tImproper input - Campaign not saved.\n'
 
 	#campaign.insertManager()
 	#cursor.execute('select * from Manages')
@@ -323,7 +304,7 @@ def main():
 	
 	startMenu()
 
-	dbconn.commit()
+	#dbconn.commit()
 
 	cursor.close()
 	dbconn.close()
