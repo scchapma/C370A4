@@ -24,15 +24,15 @@ class Campaign:
 
 	def insertCampaign(self):
 		#insert try/catch
-		cursor.execute("INSERT INTO Campaigns (id, name, startDate, endDate) VALUES (%s, %s, %s, %s)", ("C13", self.name, self.start_date, self.end_date))
+		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
 
 	def insertManager(self, campaign_id, employee_id):
 		#get campaign id#	
 		#get manager's employee number or report invalid
 		#insert try/catch
 
-		cursor.execute("INSERT INTO Manages (campaign, employee) VALUES (%s, %s)", (campaign_id, employee_id))
-		cursor.execute("select * from Manages where campaign='%s'" %campaign_id)
+		cursor.execute("INSERT INTO Manages (campaign, manager) VALUES (%d, %d)" %(campaign_id, employee_id))
+		cursor.execute("select * from Manages where campaign='%s'" %str(campaign_id))
 		dbconn.commit()
 		
 		return
@@ -216,10 +216,10 @@ def menu2():
 	To prevent errors, please enter data in accord 
 	with the format provided for each field.
 	
-	1.  Please enter campaign name (40 characters or less): \n	
+	1.  Please enter campaign name (25 characters or less): \n	
 	"""	
 	campaign_name = raw_input(intro_str)
-	if len(campaign_name) > 40:
+	if len(campaign_name) > 25:
 		print '\n\t***Campaign name length out of limits - return to main***\n'
 		return
 	
@@ -247,7 +247,7 @@ def menu2():
 	print "\n\tYou have entered the following information: \n"
 	printReport(header, rows)
 
-	id_str = ''
+	#camp_id = ''
 	review_flag = True
 	
 	while (review_flag):
@@ -256,7 +256,7 @@ def menu2():
 		campaign_review_choice = raw_input(campaign_review_string)
 		
 		if (campaign_review_choice == 'y'):
-			id_str = str(rows[0][0])
+			camp_id = rows[0][0]
 			dbconn.commit()
 			print '\n\tChanges committed.\n'
 			review_flag = False
@@ -275,16 +275,19 @@ def menu2():
 
 	manager_str = """
 	The campaign manager must be entered by employee number.
-	For instance, for Amy Arugula, you would enter 'E1'.
+	For instance, for Amy Arugula, you would enter '1'.
 
 	Please enter employee number: \n
 	"""
 	manager_emp_id = raw_input(manager_str)
-	campaign.insertManager(id_str, manager_emp_id)
+
+	#check to see that this is within range -if not, exit
+	
+	campaign.insertManager(camp_id, int(manager_emp_id))
 	#check for proper format and that manager is an employee
 
 	#confirm that manager correct
-	cursor.execute("select name from Employees, Manages where id=employee and campaign='%s'" %id_str)
+	cursor.execute("select name from Employees, Manages where id=manager and campaign=%d" %camp_id)
 	manager_str = cursor.fetchall()
 	print 'Campaign manager: %s' %manager_str[0]
 
