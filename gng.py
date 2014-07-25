@@ -355,6 +355,20 @@ def showVolunteerList(campaign, camp_id):
 def addVolunteer(campaign, camp_id):
 
 	addVolunteerFlag = True
+
+	query_str = """
+	Would you like to add any volunteers (y/n)? \n 
+	"""
+	query_choice = raw_input(query_str)
+	if query_choice == 'n':
+		print "Exiting - no volunteers added.\n"
+		return
+	elif query_choice == 'y':
+		dummy = ''
+	else:
+		print "Exiting - improper input.\n"	
+		return
+
 	while (addVolunteerFlag):
 		
 		#new or existing volunteer?		
