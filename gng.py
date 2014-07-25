@@ -25,17 +25,22 @@ class Campaign:
 
 	def insertCampaign(self):
 		#insert try/catch
-		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
+		try:
+			cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
+		except:
+			print "Insert campaign failed.\n"
 
 	def insertManager(self, campaign_id, employee_id):
 		#get campaign id#	
 		#get manager's employee number or report invalid
 		#insert try/catch
 
-		cursor.execute("INSERT INTO Manages (campaign, manager) VALUES (%d, %d)" %(campaign_id, employee_id))
-		cursor.execute("select * from Manages where campaign='%s'" %str(campaign_id))
-		dbconn.commit()
-		
+		try:
+			cursor.execute("INSERT INTO Manages (campaign, manager) VALUES (%d, %d)" %(campaign_id, employee_id))
+			#cursor.execute("select * from Manages where campaign='%s'" %str(campaign_id))
+			dbconn.commit()
+		except:
+			print "Insert manager failed.\n"		
 		return
 
 	def insertNewVolunteer(self, vol_name, vol_start_date):
@@ -379,9 +384,6 @@ def menu2():
 
 	addManager(campaign, camp_id)
 	addVolunteer(campaign, camp_id)
-
-	volunteer_str = 'Add volunteer for campaign (e.g. "Vladimir Putin"): \n'
-	volunteer = raw_input(volunteer_str)
 	
 def menu3():
 	print menu3
@@ -409,14 +411,15 @@ def testGraph():
 
 def main():
 	
-	#startMenu()
+	startMenu()
 
-	try:
-		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
-	
-	except Exception, e:
-		pass
-		print "Error - insert failed.\n"
+	#try:
+	#	cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
+	#	dbconn.commit()
+	#
+	#except Exception, e:
+	#	pass
+	#	print "Error - insert failed.\n"
 
 	cursor.close()
 	dbconn.close()
