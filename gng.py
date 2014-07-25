@@ -37,7 +37,10 @@ class Campaign:
 		
 		return
 
-	def insertNewVolunteer(self, volunteer):
+	def insertNewVolunteer(self, vol_name, vol_start_date):
+				
+		cursor.execute("INSERT INTO Volunteers (name, startDate, seniorVolunteer) VALUES (%s, %s, False)", (vol_name, vol_start_date))
+		
 		return
 
 	def insertVolunteer(self, volunteer):
@@ -210,7 +213,113 @@ def menu1():
 	return
 		
 
+def addManager(campaign, camp_id):
+
+	manager_str = """
+	The campaign manager must be entered by employee number.
+	For instance, for Amy Arugula, you would enter '1'.
+
+	Please enter employee number: \n
+	"""
+	manager_emp_id = raw_input(manager_str)
+
+	#check to see that this is within range -if not, exit
+
+	campaign.insertManager(camp_id, int(manager_emp_id))
+	#check for proper format and that manager is an employee
+
+	#confirm that manager correct
+	cursor.execute("select name from Employees, Manages where id=manager and campaign=%d" %camp_id)
+	manager_str = cursor.fetchall()
+	print 'Campaign manager: %s' %manager_str[0]
+
+	manager_review_flag = True
+
+	while (manager_review_flag):
+		#allow user to accept or reject campaign before commit
+		manager_review_string = "\n\tIs this information correct (y/n) ?\n\n\t"
+		manager_review_choice = raw_input(manager_review_string)
+		
+		if (manager_review_choice == 'y'):
+			dbconn.commit()
+			print '\n\tChanges committed.\n'
+			manager_review_flag = False
+		elif(manager_review_choice == 'n'):
+			dbconn.rollback()
+			print '\n\tManager deleted - please start again.\n'
+			return
+		else:
+			print '\n\tImproper input - Manager not saved.\n'
+
+def addVolunteer(campaign, camp_id):
+
+	addVolunteerFlag = True
+	while (addVolunteerFlag):
+		#new or existing volunteer?
+		
+		volunteer_str = """
+	Is the volunteer new (y/n)? \n
+	"""
+		volunteer_status = raw_input(volunteer_str)
+	
+		if(volunteer_status == 'y'):	
+			vol_name_str = """
+	Please enter the volunteer's name (first name then last name):  \n
+	"""
+			vol_name = raw_input(vol_name_str)
+			vol_start_date_str = """
+	Please enter the volunteer's start date (YYYY-MM-DD):  \n
+	"""
+			vol_start_date = raw_input(vol_start_date_str)
+			campaign.insertNewVolunteer(vol_name, vol_start_date)
+			#confirm that volunteer is correct
+			cursor.execute("select name from Volunteers where name='%s'" %vol_name)
+			vol_name_str = cursor.fetchall()
+			cursor.execute("select startdate from Volunteers where name='%s'" %vol_name)
+			vol_date_str = cursor.fetchall()
+
+			print "\n\tVolunteer's name: %s" %vol_name_str[0]
+			print "\tVolunteer's start date: %s\n" %vol_date_str[0]
+
+			vol_info_str = """
+	Is this information correct? (y/n)? \n
+	"""
+			vol_info = raw_input(vol_info_str)
+			if vol_info == 'y':
+				dbconn.commit()
+				print 'Changes committed.\n'
+			elif vol_info  == 'n':
+				dbconn.rollback()
+				print '\n\tVolunteer deleted - please start again.\n'
+				
+			else:
+				print '\n\tImproper input - Volunteer not saved.\n'
+				return
+
+			vol_add_another_str = """
+	Would you like to add another volunteer? (y/n)? \n
+	"""
+			vol_continue = raw_input(vol_add_another_str)
+			if vol_continue == 'y':
+				dummy = 0
+			elif vol_continue == 'n':
+				print 'Return to main menu.\n'
+				addVolunteerFlag = False
+			else:
+				print 'Improper input - exiting.\n'
+				return
+
+		elif(volunteer_status == 'n'):
+			print "Old volunteer!\n"
+			return
+
+		else:
+			print "\n\tImproper input - exiting program - volunteer not saved.\n"
+			return
+
+
 def menu2():
+	
 	intro_str = """\tTo create a new campaign, you will need to enter
 	data for several data fields. \n
 	To prevent errors, please enter data in accord 
@@ -267,48 +376,8 @@ def menu2():
 		else:
 			print '\n\tImproper input - Campaign not saved.\n'
 
-	#campaign.insertManager()
-	#cursor.execute('select * from Manages')
-	
-	#allow user to review table information
-	#allow user to edit table information?
-
-	manager_str = """
-	The campaign manager must be entered by employee number.
-	For instance, for Amy Arugula, you would enter '1'.
-
-	Please enter employee number: \n
-	"""
-	manager_emp_id = raw_input(manager_str)
-
-	#check to see that this is within range -if not, exit
-	
-	campaign.insertManager(camp_id, int(manager_emp_id))
-	#check for proper format and that manager is an employee
-
-	#confirm that manager correct
-	cursor.execute("select name from Employees, Manages where id=manager and campaign=%d" %camp_id)
-	manager_str = cursor.fetchall()
-	print 'Campaign manager: %s' %manager_str[0]
-
-	manager_review_flag = True
-
-	while (manager_review_flag):
-		#allow user to accept or reject campaign before commit
-		manager_review_string = "\n\tIs this information correct (y/n) ?\n\n\t"
-		manager_review_choice = raw_input(manager_review_string)
-		
-		if (manager_review_choice == 'y'):
-			dbconn.commit()
-			print '\n\tChanges committed.\n'
-			manager_review_flag = False
-		elif(manager_review_choice == 'n'):
-			dbconn.rollback()
-			print '\n\tManager deleted - please start again.\n'
-			return
-		else:
-			print '\n\tImproper input - Manager not saved.\n'
-
+	addManager(campaign, camp_id)
+	addVolunteer(campaign, camp_id)
 
 	volunteer_str = 'Add volunteer for campaign (e.g. "Vladimir Putin"): \n'
 	volunteer = raw_input(volunteer_str)
@@ -341,7 +410,8 @@ def main():
 	
 	startMenu()
 
-	#dbconn.commit()
+	#campaign = Campaign('Steve', 2014-10-12, 2014-11-23)
+	#campaign.insertNewVolunteer('Joe', '2014-12-25')
 
 	cursor.close()
 	dbconn.close()
