@@ -410,9 +410,6 @@ def main():
 	
 	startMenu()
 
-	#campaign = Campaign('Steve', 2014-10-12, 2014-11-23)
-	#campaign.insertNewVolunteer('Joe', '2014-12-25')
-
 	cursor.close()
 	dbconn.close()
 
