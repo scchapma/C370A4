@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import psycopg2
+import psycopg2.errorcodes
 import os
 import sys
 #from ascii_graph import Pyasciigraph
@@ -408,7 +409,14 @@ def testGraph():
 
 def main():
 	
-	startMenu()
+	#startMenu()
+
+	try:
+		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
+	
+	except Exception, e:
+		pass
+		print "Error - insert failed.\n"
 
 	cursor.close()
 	dbconn.close()
