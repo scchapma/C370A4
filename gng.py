@@ -39,8 +39,14 @@ class Campaign:
 	def insertNewVolunteer(self, vol_name, vol_start_date):
 				
 		cursor.execute("INSERT INTO Volunteers (name, startDate, seniorVolunteer) VALUES (%s, %s, False)", (vol_name, vol_start_date))
-		cursor.execute("INSERT INTO VolunteerWorksOn (campaign, ) VALUES (%s, %s, False)", (vol_name, vol_start_date))
-		
+		cursor.execute("Select id from Volunteers where name=%s", (vol_name,))
+		row = cursor.fetchall()
+		vol_id = int(row[0][0])
+		return vol_id
+
+	def insertNewVolunteerWorksOn(self, camp_id, vol_id):
+
+		cursor.execute("INSERT INTO VolunteerWorksOn (campaign, volunteer) VALUES (%s, %s)", (int(camp_id), int(vol_id)))
 		return
 
 	def insertVolunteer(self, volunteer):
@@ -273,7 +279,14 @@ def newVolunteer(campaign, camp_id):
 	Please enter the volunteer's start date (YYYY-MM-DD):  \n
 	"""
 	vol_start_date = raw_input(vol_start_date_str)
-	campaign.insertNewVolunteer(vol_name, vol_start_date)
+	
+	try:
+		vol_id = campaign.insertNewVolunteer(vol_name, vol_start_date)
+		campaign.insertNewVolunteerWorksOn(camp_id, vol_id)
+	except:
+		print "Insert new volunteer failed.\n"
+		return
+	
 	#confirm that volunteer is correct
 	cursor.execute("select name from Volunteers where name='%s'" %vol_name)
 	vol_name_str = cursor.fetchall()
@@ -461,11 +474,11 @@ def testGraph():
 
 def main():
 	
-	#startMenu()
+	startMenu()
 
-	campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
-	camp_id = 50
-	addVolunteer(campaign, camp_id)
+	#campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
+	#camp_id = 5
+	#addVolunteer(campaign, camp_id)
 
 	cursor.close()
 	dbconn.close()
