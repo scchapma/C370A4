@@ -25,27 +25,21 @@ class Campaign:
 
 	def insertCampaign(self):
 		#insert try/catch
-		try:
-			cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
-		except:
-			print "Insert campaign failed.\n"
+		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
 
 	def insertManager(self, campaign_id, employee_id):
 		#get campaign id#	
 		#get manager's employee number or report invalid
 		#insert try/catch
 
-		try:
-			cursor.execute("INSERT INTO Manages (campaign, manager) VALUES (%d, %d)" %(campaign_id, employee_id))
-			#cursor.execute("select * from Manages where campaign='%s'" %str(campaign_id))
-			dbconn.commit()
-		except:
-			print "Insert manager failed.\n"		
-		return
+		cursor.execute("INSERT INTO Manages (campaign, manager) VALUES (%d, %d)" %(campaign_id, employee_id))
+		#cursor.execute("select * from Manages where campaign='%s'" %str(campaign_id))
+		#dbconn.commit()
 
 	def insertNewVolunteer(self, vol_name, vol_start_date):
 				
 		cursor.execute("INSERT INTO Volunteers (name, startDate, seniorVolunteer) VALUES (%s, %s, False)", (vol_name, vol_start_date))
+		cursor.execute("INSERT INTO VolunteerWorksOn (campaign, ) VALUES (%s, %s, False)", (vol_name, vol_start_date))
 		
 		return
 
@@ -157,7 +151,7 @@ def menu1():
 	5.   Which campaigns, if any, have only one activity?
 	6.   How much was the highest expense, and what was it for?	
 	7.   Which employees or volunteers have made a single donation of at least $5000?
-	8.   What is the total number of web updates that have been pushed to the website?
+	8.   What is the total number of webInsert manager updates that have been pushed to the website?
 	9.   For each campaign, what is the average amount per expense?
 	10.  How many activities does each campaign have?
 	11.  Find tuples that join website updates to their campaigns.
@@ -219,6 +213,16 @@ def menu1():
 	return
 		
 
+#def checkManagerNumber(man_id_str):
+#	isEmployee = True
+#	man_id = int(man_id_str)
+#		Select name
+#		From Employees
+#	""", (man_id,))
+#	if cursor.rowcount == 0:
+#		isEmployee = False
+
+
 def addManager(campaign, camp_id):
 
 	manager_str = """
@@ -229,10 +233,12 @@ def addManager(campaign, camp_id):
 	"""
 	manager_emp_id = raw_input(manager_str)
 
-	#check to see that this is within range -if not, exit
-
-	campaign.insertManager(camp_id, int(manager_emp_id))
-	#check for proper format and that manager is an employee
+	#check to see that emp_id is within range - if not, exit
+	try:
+		campaign.insertManager(camp_id, int(manager_emp_id))
+	except:
+		print "Insert manager failed.\n"
+		return
 
 	#confirm that manager correct
 	cursor.execute("select name from Employees, Manages where id=manager and campaign=%d" %camp_id)
@@ -257,71 +263,105 @@ def addManager(campaign, camp_id):
 		else:
 			print '\n\tImproper input - Manager not saved.\n'
 
+def newVolunteer(campaign, camp_id):
+
+	vol_name_str = """
+	Please enter the volunteer's name (first name then last name):  \n
+	"""
+	vol_name = raw_input(vol_name_str)
+	vol_start_date_str = """
+	Please enter the volunteer's start date (YYYY-MM-DD):  \n
+	"""
+	vol_start_date = raw_input(vol_start_date_str)
+	campaign.insertNewVolunteer(vol_name, vol_start_date)
+	#confirm that volunteer is correct
+	cursor.execute("select name from Volunteers where name='%s'" %vol_name)
+	vol_name_str = cursor.fetchall()
+	cursor.execute("select startdate from Volunteers where name='%s'" %vol_name)
+	vol_date_str = cursor.fetchall()
+
+	print "\n\tVolunteer's name: %s" %vol_name_str[0]
+	print "\tVolunteer's start date: %s\n" %vol_date_str[0]
+
+	vol_info_str = """
+	Is this information correct? (y/n)? \n
+	"""
+	vol_info = raw_input(vol_info_str)
+	if vol_info == 'y':
+		dbconn.commit()
+		print 'Changes committed.\n'
+	elif vol_info  == 'n':
+		dbconn.rollback()
+		print '\n\tVolunteer deleted - please start again.\n'
+				
+	else:
+		print '\n\tImproper input - Volunteer not saved.\n'
+	return
+
+def oldVolunteer(campaign, camp_id):
+	print "Enter oldVolunteer method.\n"
+	#enter volunteer's #
+	#confirm volunteer information
+	return
+
+def addAnotherVolunteer():
+
+	addVolunteerFlag = True
+	vol_add_another_str = """
+	Would you like to add another volunteer? (y/n)? \n
+	"""
+	vol_continue = raw_input(vol_add_another_str)
+	if vol_continue == 'y':
+		dummy = 0
+	elif vol_continue == 'n':
+		print 'Return to main menu.\n'
+		addVolunteerFlag = False
+	else:
+		print 'Improper input - exiting.\n'
+		addVolunteerFlag = False
+		#return
+	return addVolunteerFlag
+
+def showVolunteerList(campaign, camp_id):
+	rows = []
+	header = []
+	try:
+		cursor.execute('Select * from VolunteerWorksOn where campaign = %s', (int(camp_id),))
+		rows = cursor.fetchall()
+	except:
+		print "Print volunteer list failed.\n"
+	if (cursor.rowcount): 
+		for x in range(0, len(rows[0])):
+			header.append(cursor.description[x].name)
+		print "\n\tVolunteers for this campaign: \n"
+		printReport(header, rows)
+	else:
+		print "No volunteers have been added to this campaign.\n"
+	return
+
 def addVolunteer(campaign, camp_id):
 
 	addVolunteerFlag = True
 	while (addVolunteerFlag):
-		#new or existing volunteer?
 		
+		#new or existing volunteer?		
 		volunteer_str = """
 	Is the volunteer new (y/n)? \n
 	"""
 		volunteer_status = raw_input(volunteer_str)
 	
 		if(volunteer_status == 'y'):	
-			vol_name_str = """
-	Please enter the volunteer's name (first name then last name):  \n
-	"""
-			vol_name = raw_input(vol_name_str)
-			vol_start_date_str = """
-	Please enter the volunteer's start date (YYYY-MM-DD):  \n
-	"""
-			vol_start_date = raw_input(vol_start_date_str)
-			campaign.insertNewVolunteer(vol_name, vol_start_date)
-			#confirm that volunteer is correct
-			cursor.execute("select name from Volunteers where name='%s'" %vol_name)
-			vol_name_str = cursor.fetchall()
-			cursor.execute("select startdate from Volunteers where name='%s'" %vol_name)
-			vol_date_str = cursor.fetchall()
-
-			print "\n\tVolunteer's name: %s" %vol_name_str[0]
-			print "\tVolunteer's start date: %s\n" %vol_date_str[0]
-
-			vol_info_str = """
-	Is this information correct? (y/n)? \n
-	"""
-			vol_info = raw_input(vol_info_str)
-			if vol_info == 'y':
-				dbconn.commit()
-				print 'Changes committed.\n'
-			elif vol_info  == 'n':
-				dbconn.rollback()
-				print '\n\tVolunteer deleted - please start again.\n'
-				
-			else:
-				print '\n\tImproper input - Volunteer not saved.\n'
-				return
-
-			vol_add_another_str = """
-	Would you like to add another volunteer? (y/n)? \n
-	"""
-			vol_continue = raw_input(vol_add_another_str)
-			if vol_continue == 'y':
-				dummy = 0
-			elif vol_continue == 'n':
-				print 'Return to main menu.\n'
-				addVolunteerFlag = False
-			else:
-				print 'Improper input - exiting.\n'
-				return
+			newVolunteer(campaign, camp_id)
 
 		elif(volunteer_status == 'n'):
-			print "Old volunteer!\n"
-			return
+			oldVolunteer(campaign, camp_id)
 
 		else:
 			print "\n\tImproper input - exiting program - volunteer not saved.\n"
 			return
+
+		showVolunteerList(campaign, camp_id)
+		addVolunteerFlag = addAnotherVolunteer()
 
 
 def menu2():
@@ -349,10 +389,20 @@ def menu2():
 	campaign = Campaign(campaign_name, start_date, end_date)
 
 	###need try/catch here in case Date (or other field) not properly formed###
-	campaign.insertCampaign()
-	cursor.execute("select * from Campaigns where name='%s'" %campaign.name)
+	
+	try:
+		campaign.insertCampaign()
+		cursor.execute("select * from Campaigns where name='%s'" %campaign.name)
+	except:
+		print "Insert campaign failed.\n"
+		return
 
-	rows = cursor.fetchall()
+	try:
+		rows = cursor.fetchall()
+	except:
+		print "No rows to print."
+		return
+
 	header = []
 	#what if rows = 0?
 	for x in range(0, len(rows[0])):
@@ -411,15 +461,11 @@ def testGraph():
 
 def main():
 	
-	startMenu()
+	#startMenu()
 
-	#try:
-	#	cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
-	#	dbconn.commit()
-	#
-	#except Exception, e:
-	#	pass
-	#	print "Error - insert failed.\n"
+	campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
+	camp_id = 50
+	addVolunteer(campaign, camp_id)
 
 	cursor.close()
 	dbconn.close()
