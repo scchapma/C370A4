@@ -231,6 +231,8 @@ def menu1():
 
 def addManager(campaign, camp_id):
 
+	os.system('clear')
+
 	manager_str = """
 	The campaign manager must be entered by employee number.
 	For instance, for Amy Arugula, you would enter '1'.
@@ -328,25 +330,32 @@ def oldVolunteer(campaign, camp_id):
 	"""
 	vol_id = raw_input(vol_str)
 	
+	old_vol_str = ''
 	try:
 		campaign.insertVolunteerWorksOn(camp_id, vol_id)
+		#confirm that manager correct
+		cursor.execute("select name from Volunteers where id=%d" %int(vol_id))
+		old_vol_str = cursor.fetchall()
 	except:
 		dbconn.rollback()
-		print "Insert volunteer failed.\n"
+		print "Insert volunteer failed - no such volunteer.\n"
 		return
-	
+		
+	print 'Volunteer: %s' %old_vol_str[0]
+
 	confirmVolunteer()
 	return
 
 def addAnotherVolunteer():
 
 	addVolunteerFlag = True
+
 	vol_add_another_str = """
 	Would you like to add another volunteer? (y/n)? \n
 	"""
 	vol_continue = raw_input(vol_add_another_str)
 	if vol_continue == 'y':
-		dummy = 0
+		os.system('clear')
 	elif vol_continue == 'n':
 		print 'Return to main menu.\n'
 		addVolunteerFlag = False
@@ -377,6 +386,7 @@ def addVolunteer(campaign, camp_id):
 
 	addVolunteerFlag = True
 
+	#os.system('clear')
 	query_str = """
 	Would you like to add any volunteers (y/n)? \n 
 	"""
@@ -385,7 +395,7 @@ def addVolunteer(campaign, camp_id):
 		print "Exiting - no volunteers added.\n"
 		return
 	elif query_choice == 'y':
-		dummy = ''
+		os.system('clear')
 	else:
 		print "Exiting - improper input.\n"	
 		return
