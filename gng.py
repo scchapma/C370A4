@@ -44,13 +44,13 @@ class Campaign:
 		vol_id = int(row[0][0])
 		return vol_id
 
-	def insertNewVolunteerWorksOn(self, camp_id, vol_id):
+	def insertVolunteerWorksOn(self, camp_id, vol_id):
 
 		cursor.execute("INSERT INTO VolunteerWorksOn (campaign, volunteer) VALUES (%s, %s)", (int(camp_id), int(vol_id)))
 		return
 
-	def insertVolunteer(self, volunteer):
-		return
+	#def insertVolunteer(self, vol_id):
+		#return
 
 #print report
 #input: list of rows, list of header fields
@@ -269,25 +269,10 @@ def addManager(campaign, camp_id):
 		else:
 			print '\n\tImproper input - Manager not saved.\n'
 
-def newVolunteer(campaign, camp_id):
+def confirmVolunteer():
 
-	vol_name_str = """
-	Please enter the volunteer's name (first name then last name):  \n
-	"""
-	vol_name = raw_input(vol_name_str)
-	vol_start_date_str = """
-	Please enter the volunteer's start date (YYYY-MM-DD):  \n
-	"""
-	vol_start_date = raw_input(vol_start_date_str)
-	
-	try:
-		vol_id = campaign.insertNewVolunteer(vol_name, vol_start_date)
-		campaign.insertNewVolunteerWorksOn(camp_id, vol_id)
-	except:
-		print "Insert new volunteer failed.\n"
-		return
-	
 	#confirm that volunteer is correct
+	#***try/catch***
 	cursor.execute("select name from Volunteers where name='%s'" %vol_name)
 	vol_name_str = cursor.fetchall()
 	cursor.execute("select startdate from Volunteers where name='%s'" %vol_name)
@@ -311,10 +296,44 @@ def newVolunteer(campaign, camp_id):
 		print '\n\tImproper input - Volunteer not saved.\n'
 	return
 
+def newVolunteer(campaign, camp_id):
+
+	vol_name_str = """
+	Please enter the volunteer's name (first name then last name):  \n
+	"""
+	vol_name = raw_input(vol_name_str)
+	vol_start_date_str = """
+	Please enter the volunteer's start date (YYYY-MM-DD):  \n
+	"""
+	vol_start_date = raw_input(vol_start_date_str)
+	
+	try:
+		vol_id = campaign.insertNewVolunteer(vol_name, vol_start_date)
+		campaign.insertVolunteerWorksOn(camp_id, vol_id)
+	except:
+		print "Insert new volunteer failed.\n"
+		return
+
+	confirmVolunteer()
+	return
+		
+
 def oldVolunteer(campaign, camp_id):
-	print "Enter oldVolunteer method.\n"
-	#enter volunteer's #
-	#confirm volunteer information
+	vol_str = """
+	The volunteer must be entered by existing volunteer number.
+	For instance, for Gary Gold, you would enter '1'.
+
+	Please enter volunteer number: \n
+	"""
+	vol_id = raw_input(vol_str)
+	
+	try:
+		campaign.insertVolunteerWorksOn(camp_id, vol_id)
+	except:
+		print "Insert volunteer failed.\n"
+		return
+	
+	confirmVolunteer()
 	return
 
 def addAnotherVolunteer():
