@@ -224,6 +224,79 @@ def menu1():
 #		isEmployee = False
 
 
+def addCampaign():
+	
+	intro_str = """\tTo create a new campaign, you will need to enter
+	data for several data fields. \n
+	To prevent errors, please enter data in accord 
+	with the format provided for each field.
+	
+	1.  Please enter campaign name (25 characters or less): \n	
+	"""	
+	campaign_name = raw_input(intro_str)
+	if len(campaign_name) > 25:
+		print '\n\t***Campaign name length out of limits - return to main***\n'
+		return
+	
+	start_date_str = '\n\t2.  Enter campaign start date (YYYY-MM-DD): \n\n\t'
+	start_date = raw_input(start_date_str) 
+	#check for proper format
+
+	end_date_str = '\n\t3.  Enter campaign end date (YYYY-MM-DD): \n\n\t'
+	end_date = raw_input(end_date_str)
+	#check for proper format
+
+	campaign = Campaign(campaign_name, start_date, end_date)
+
+	###need try/catch here in case Date (or other field) not properly formed###
+	
+	try:
+		campaign.insertCampaign()
+		cursor.execute("select * from Campaigns where name='%s'" %campaign.name)
+	except:
+		print "Insert campaign failed.\n"
+		return
+
+	try:
+		rows = cursor.fetchall()
+	except:
+		print "No rows to print."
+		return
+
+	header = []
+	#what if rows = 0?
+	for x in range(0, len(rows[0])):
+		header.append(cursor.description[x].name)
+	
+	#display input to user
+	print "\n\tYou have entered the following information: \n"
+	printReport(header, rows)
+
+	#camp_id = ''
+	review_flag = True
+	
+	while (review_flag):
+		#allow user to accept or reject campaign before commit
+		campaign_review_string = "\n\tIs this information correct (y/n) ?\n\n\t"
+		campaign_review_choice = raw_input(campaign_review_string)
+		
+		if (campaign_review_choice == 'y'):
+			camp_id = rows[0][0]
+			dbconn.commit()
+			print '\n\tChanges committed.\n'
+			review_flag = False
+		elif(campaign_review_choice == 'n'):
+			dbconn.rollback()
+			print '\n\tCampaign deleted - please start again.\n'
+			return
+		else:
+			print '\n\tImproper input - Campaign not saved.\n'
+
+	camp_list = []
+	camp_list.append(campaign)
+	camp_list.append(camp_id)
+	return camp_list
+
 def addManager(campaign, camp_id):
 
 	os.system('clear')
@@ -424,74 +497,10 @@ def addVolunteer(campaign, camp_id):
 
 def menu2():
 	
-	intro_str = """\tTo create a new campaign, you will need to enter
-	data for several data fields. \n
-	To prevent errors, please enter data in accord 
-	with the format provided for each field.
-	
-	1.  Please enter campaign name (25 characters or less): \n	
-	"""	
-	campaign_name = raw_input(intro_str)
-	if len(campaign_name) > 25:
-		print '\n\t***Campaign name length out of limits - return to main***\n'
-		return
-	
-	start_date_str = '\n\t2.  Enter campaign start date (YYYY-MM-DD): \n\n\t'
-	start_date = raw_input(start_date_str) 
-	#check for proper format
-
-	end_date_str = '\n\t3.  Enter campaign end date (YYYY-MM-DD): \n\n\t'
-	end_date = raw_input(end_date_str)
-	#check for proper format
-
-	campaign = Campaign(campaign_name, start_date, end_date)
-
-	###need try/catch here in case Date (or other field) not properly formed###
-	
-	try:
-		campaign.insertCampaign()
-		cursor.execute("select * from Campaigns where name='%s'" %campaign.name)
-	except:
-		print "Insert campaign failed.\n"
-		return
-
-	try:
-		rows = cursor.fetchall()
-	except:
-		print "No rows to print."
-		return
-
-	header = []
-	#what if rows = 0?
-	for x in range(0, len(rows[0])):
-		header.append(cursor.description[x].name)
-	
-	#display input to user
-	print "\n\tYou have entered the following information: \n"
-	printReport(header, rows)
-
-	#camp_id = ''
-	review_flag = True
-	
-	while (review_flag):
-		#allow user to accept or reject campaign before commit
-		campaign_review_string = "\n\tIs this information correct (y/n) ?\n\n\t"
-		campaign_review_choice = raw_input(campaign_review_string)
-		
-		if (campaign_review_choice == 'y'):
-			camp_id = rows[0][0]
-			dbconn.commit()
-			print '\n\tChanges committed.\n'
-			review_flag = False
-		elif(campaign_review_choice == 'n'):
-			dbconn.rollback()
-			print '\n\tCampaign deleted - please start again.\n'
-			return
-		else:
-			print '\n\tImproper input - Campaign not saved.\n'
-
-	#addCampaign()
 	#pass back values for campaign and camp_id
+	camp_list = addCampaign()
+	campaign = camp_list[0]
+	camp_id = camp_list[1]
 	addManager(campaign, camp_id)
 	addVolunteer(campaign, camp_id)
 	addActivity (campaign,camp_id)
