@@ -362,7 +362,7 @@ def showVolunteerList(campaign, camp_id):
 		rows = cursor.fetchall()
 	except:
 		print "Print volunteer list failed.\n"
-	if (cursor.rowcount): 
+	if (cursor.rowcount != 0): 
 		for x in range(0, len(rows[0])):
 			header.append(cursor.description[x].name)
 		print "\n\tVolunteers for this campaign: \n"
