@@ -478,8 +478,11 @@ def menu2():
 		else:
 			print '\n\tImproper input - Campaign not saved.\n'
 
+	#addCampaign()
+	#pass back values for campaign and camp_id
 	addManager(campaign, camp_id)
 	addVolunteer(campaign, camp_id)
+	addActivity (campaign,camp_id)
 	
 def menu3():
 	print menu3
