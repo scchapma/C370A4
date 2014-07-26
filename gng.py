@@ -369,7 +369,7 @@ def showVolunteerList(campaign, camp_id):
 	rows = []
 	header = []
 	try:
-		cursor.execute('Select * from VolunteerWorksOn where campaign = %s', (int(camp_id),))
+		cursor.execute('Select * from (Volunteers join VolunteerWorksOn on id = volunteer) where campaign = %s', (int(camp_id),))
 		rows = cursor.fetchall()
 	except:
 		print "Print volunteer list failed.\n"
