@@ -36,6 +36,7 @@ class Campaign:
 	def insertNewVolunteer(self, vol_name, vol_start_date):
 				
 		cursor.execute("INSERT INTO Volunteers (name, startDate, seniorVolunteer) VALUES (%s, %s, False)", (vol_name, vol_start_date))
+		#change to select max id
 		cursor.execute("Select id from Volunteers where name=%s", (vol_name,))
 		row = cursor.fetchall()
 		vol_id = int(row[0][0])
@@ -46,15 +47,16 @@ class Campaign:
 		cursor.execute("INSERT INTO VolunteerWorksOn (campaign, volunteer) VALUES (%s, %s)", (int(camp_id), int(vol_id)))
 		return
 
-	def insertActivity(self, activity_start, activity_end, activity_city, activity_address, activity_memo):
+	def insertActivity(self, activity_start, activity_end, activity_city, activity_address, activity_memo, camp_id):
 				
 		cursor.execute("INSERT INTO Activities (startTime, endTime, city, address, memo) VALUES (%s, %s, %s, %s, %s)", (activity_start, activity_end, activity_city, activity_address, activity_memo))
-		dbconn.commit()
-		#cursor.execute("Select id from Volunteers where name=%s", (vol_name,))
-		#row = cursor.fetchall()
-		#vol_id = int(row[0][0])
-		#return vol_id
-		return
+		#obtain Activity ID
+		cursor.execute("Select max(id) from Activities")
+		row = cursor.fetchall()
+		activity_id = int(row[0][0])
+		cursor.execute("INSERT INTO Includes VALUES (%d, %d)" %(int(camp_id), activity_id))
+		#dbconn.commit()
+		return activity_id
 
 #print report
 #input: list of rows, list of header fields
@@ -504,6 +506,84 @@ def addVolunteer(campaign, camp_id):
 		addVolunteerFlag = addAnotherVolunteer()
 	return
 
+def showActivity(activity_id):
+	rows = []
+	header = []
+	try:
+		cursor.execute("Select * from Activities where id=%d" %(int(activity_id)))
+		rows = cursor.fetchall()
+	except:
+		dbconn.rollback()
+		print "Print activity failed.\n"
+	if (cursor.rowcount > 0): 
+		for x in range(0, len(rows[0])):
+			header.append(cursor.description[x].name)
+		print "\n\tCurrent activity: \n"
+		printReport(header, rows)
+	else:
+		print "No activity added.\n"
+	return
+
+def showVolunteerList(campaign, camp_id):
+	rows = []
+	header = []
+	try:
+		cursor.execute('Select * from (Volunteers join VolunteerWorksOn on id = volunteer) where campaign = %s', (int(camp_id),))
+		rows = cursor.fetchall()
+	except:
+		print "Print volunteer list failed.\n"
+	if (cursor.rowcount > 0): 
+		for x in range(0, len(rows[0])):
+			header.append(cursor.description[x].name)
+		print "\n\tVolunteers for this campaign: \n"
+		printReport(header, rows)
+	else:
+		print "No volunteers have been added to this campaign.\n"
+	return
+	
+def confirmActivity(activity_id):
+
+	#print out report
+	try:
+		showActivity(activity_id)
+	except:
+		print "Error - could not generate report.\n"
+		return
+
+	#confirm that activity is correct
+	activity_info_str = """
+	Is this information correct? (y/n)? \n
+	"""
+	activity_info = raw_input(activity_info_str)
+	if activity_info == 'y':
+		dbconn.commit()
+		print 'Changes committed.\n'
+	elif activity_info  == 'n':
+		dbconn.rollback()
+		print '\n\tActivity deleted - please start again.\n'				
+	else:
+		print '\n\tImproper input - Activity not saved.\n'
+	return
+
+def addAnotherActivity():
+
+	addActivityFlag = True
+
+	activity_add_another_str = """
+	Would you like to add another activity? (y/n)? \n
+	"""
+	activity_continue = raw_input(activity_add_another_str)
+	if activity_continue == 'y':
+		os.system('clear')
+	elif activity_continue == 'n':
+		print 'Exiting - campaign set up complete.\n'
+		addActivityFlag = False
+	else:
+		print 'Improper input - exiting.\n'
+		addActivityFlag = False
+		#return
+	return addActivityFlag
+
 def addActivity(campaign, camp_id):
 	
 	addActivityFlag = True
@@ -555,15 +635,19 @@ def addActivity(campaign, camp_id):
 	"""
 		memo = raw_input(memo_str)
 
-		#try/except
 		#insert activity into Activities table
-		#insert acitivity and campaign in Includes table
+		#insert acitivity and campaign into Includes table
+		activity_id = None
+		try:
+			activity_id = campaign.insertActivity(start_time, end_time, city, address, memo, camp_id)
+		except:
+			print "Error - could not insert new activity.\n"
 
-		campaign.insertActivity(start_time, end_time, city, address, memo)
+		if (activity_id):
+			confirmActivity(activity_id)
 
 		#showVolunteerList(campaign, camp_id)
-		#addVolunteerFlag = addAnotherVolunteer()
-		addActivityFlag = False
+		addActivityFlag = addAnotherActivity()
 	return
 
 
@@ -612,7 +696,7 @@ def main():
 	#startMenu()
 
 	campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
-	camp_id = 10
+	camp_id = 5
 	addActivity(campaign, camp_id)
 
 	cursor.close()
