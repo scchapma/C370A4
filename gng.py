@@ -221,19 +221,8 @@ def menu1():
 	Please enter a number between 1 and 11 or enter '0' to exit.\n
 	"""
 				menu1_use_choice = raw_input(error_str)
-
 	return
 		
-
-#def checkManagerNumber(man_id_str):
-#	isEmployee = True
-#	man_id = int(man_id_str)
-#		Select name
-#		From Employees
-#	""", (man_id,))
-#	if cursor.rowcount == 0:
-#		isEmployee = False
-
 
 def addCampaign():
 	
@@ -677,6 +666,7 @@ def menu2():
 	addManager(campaign, camp_id)
 	addVolunteer(campaign, camp_id)
 	addActivity (campaign,camp_id)
+	#print final summary?
 	return
 	
 def menu3():
@@ -705,11 +695,11 @@ def testGraph():
 
 def main():
 	
-	#startMenu()
+	startMenu()
 
-	campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
-	camp_id = 5
-	addActivity(campaign, camp_id)
+	#campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
+	#camp_id = 5
+	#addActivity(campaign, camp_id)
 
 	cursor.close()
 	dbconn.close()
