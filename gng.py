@@ -694,7 +694,9 @@ def graph(header, rows, amount_field, tag_field):
 
 	max_value = max(values)	
 
-	print header
+	header_str = '\n\n\n'
+	header_str += header
+	print header_str
 	print '-'*85
 	for x in range(0, len(values)):
 		row_str = ''
@@ -712,14 +714,14 @@ def summary():
 	print "Enter summary.\n"
 	return
 
-def rows(input_string):
+def process_input(input_string):
 	rows = []
-	#try:
-	cursor.execute('Select * from Donations')
-	rows = cursor.fetchall()
-	#except:
-	#	dbconn.rollback()
-	#	print "Error - could not return input for graph.\n"
+	try:
+		cursor.execute(input_string)
+		rows = cursor.fetchall()
+	except:
+		dbconn.rollback()
+		print "Error - could not return input for graph.\n"
 	return rows
 
 def menu3():
@@ -734,30 +736,23 @@ def menu3():
 
 	#Add end date
 	end_str = """
-	Please enter the end date (YYYY-MM-DD HH:MM:SS): \n
+	Please enter the end date (YYYY-MM-DD): \n
 	"""
 	end_date = raw_input(end_str)
 
-	#obtain input information for Donations - max, values, labels
-	#obtain input information for Contributions - max, values, labels
+	#obtain input information for Donations 
 	#obtain input information for Expenses - max, values, labels
-
 	donations_input = []
-	#contributions_input = []
 	expenses_input = []
 
 	donations_str = 'Select * from Donations'
-	#contributions_str = 'Select * from Contributions'
 	expenses_str = 'Select * from Expenses'
 
-	donations_input = rows(donations_str)
-	#contributions_input = rows(contributions_str)
-	expenses_input = rows(expenses_str)
+	donations_input = process_input(donations_str)
+	expenses_input = process_input(expenses_str)
 	
 	#produce graph for Donations
 	graph("Donations", donations_input, DONATION_AMOUNT_FIELD, DONATION_TAG_FIELD)
-	#produce graph for Contributions
-	#graph("Contributions", contributions_input)
 	#produce graph for Expenses
 	graph("Expenses", expenses_input, EXPENSE_AMOUNT_FIELD, EXPENSE_TAG_FIELD)
 	
