@@ -11,7 +11,10 @@ dbconn = psycopg2.connect(host='studentdb.csc.uvic.ca', user='c370_s09', passwor
 cursor = dbconn.cursor()
 
 #class constants
-num_choices = 11
+NUM_CHOICES = 11
+AMOUNT_WIDTH = 50
+AMOUNT_TAG_WIDTH = 15
+MEMO_WIDTH = 15
 
 #git comment
 
@@ -187,7 +190,7 @@ def menu1():
 				if (menu_value == 0):
 					return
 				
-				elif (menu_value < 1 or menu_value> num_choices):
+				elif (menu_value < 1 or menu_value> NUM_CHOICES):
 					error_str = """\n\tInteger entered out of range: \n
 	Please enter a number between 1 and 11 or enter '0' to exit.\n
 	"""
@@ -198,21 +201,25 @@ def menu1():
 					os.system('clear')
 
 					print "\n\tData for query %s:\n " %menu1_use_choice
-					cursor.execute('select * from question%s' %menu1_use_choice)
-					rows = cursor.fetchall()
-					header = []
-					#what if rows = 0?
-					for x in range(0, len(rows[0])):
-						header.append(cursor.description[x].name)
-					printReport(header, rows)
-					input_flag = False
+					try: 
+						cursor.execute('select * from question%s' %menu1_use_choice)
+						rows = cursor.fetchall()
+						header = []
+						#what if rows = 0?
+						for x in range(0, len(rows[0])):
+							header.append(cursor.description[x].name)
+						printReport(header, rows)
+						input_flag = False
+					except:
+						dbconn.rollback()
+						print "Error - could not return query.\n"
 
 					#check to see if user wants to return to query menu
 					query_str = '\tDo you want to return to the query menu? (y/n)\n'
 					query_choice = raw_input(query_str)
 
 					if query_choice == 'y':
-						dummy_str = ''
+						input_flag = False
 					else:
 						query_flag = False
 						return
@@ -667,8 +674,63 @@ def menu2():
 	#print final summary?
 	return
 	
+def intro_menu3():
+	print "Welcome to menu 3 - accounting information.\n"
+	return
+
+def graph(count, max_value, values, labels):
+	print "Graph Header"
+	print '-'*80
+	for x in range(0, count):
+		row_str = ''
+		unit = max_value/AMOUNT_WIDTH
+		units = (values[x]/unit)
+		bar = '#'*units
+		row_str += bar.ljust(AMOUNT_WIDTH)
+		row_str += str(values[x]).rjust(AMOUNT_TAG_WIDTH)
+		row_str += ' '*5
+		row_str += str(labels[x]).ljust(MEMO_WIDTH)
+		print row_str
+	return
+
+def summary():
+	print "Enter summary.\n"
+	return
+
 def menu3():
-	print menu3
+	#intro string - gives accounting information for any chosen time interval
+	intro_menu3()
+	
+	#Add start	date	
+	start_str = """
+	Please enter the start date (YYYY-MM-DD): \n
+	"""
+	start_date = raw_input(start_str)
+
+	#Add end date
+	end_str = """
+	Please enter the end date (YYYY-MM-DD HH:MM:SS): \n
+	"""
+	end_date = raw_input(end_str)
+
+	#obtain input information for Donations - max, values, labels
+	#obtain input information for Contributions - max, values, labels
+	#obtain input information for Expenses - max, values, labels
+	
+	#produce graph for Donations
+	graph()
+	#produce graph for Contributions
+	graph()
+	#produce graph for Expenses
+	graph()
+	
+	#starting account balance
+	#text line - total income
+	#text line - total expenses
+	#text line - net amount for this interval: (income - expenses)
+	#ending account balance
+	summary()
+	return
 
 def menu4():
 	print menu4
@@ -693,11 +755,16 @@ def testGraph():
 
 def main():
 	
-	startMenu()
+	#startMenu()
 
 	#campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
 	#camp_id = 5
 	#addActivity(campaign, camp_id)
+	count = 3
+	max_value = 50
+	values = [10, 30, 50]
+	labels = ['ten', 'thirty', 'fifty']
+	graph(count, max_value, values, labels)
 
 	cursor.close()
 	dbconn.close()
