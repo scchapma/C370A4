@@ -302,6 +302,7 @@ def newVolunteer(campaign, camp_id):
 		vol_id = campaign.insertNewVolunteer(vol_name, vol_start_date)
 		campaign.insertVolunteerWorksOn(camp_id, vol_id)
 	except:
+		dbconn.rollback()
 		print "Insert new volunteer failed.\n"
 		return
 
@@ -358,11 +359,11 @@ def addAnotherVolunteer():
 def showVolunteerList(campaign, camp_id):
 	rows = []
 	header = []
-	#try:
-	cursor.execute('Select * from VolunteerWorksOn where campaign = %s', (int(camp_id),))
-	rows = cursor.fetchall()
-	#except:
-		#print "Print volunteer list failed.\n"
+	try:
+		cursor.execute('Select * from VolunteerWorksOn where campaign = %s', (int(camp_id),))
+		rows = cursor.fetchall()
+	except:
+		print "Print volunteer list failed.\n"
 	print "Row count: %s" %cursor.rowcount
 	if (cursor.rowcount > 0): 
 		for x in range(0, len(rows[0])):
