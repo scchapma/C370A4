@@ -46,6 +46,15 @@ class Campaign:
 		cursor.execute("INSERT INTO VolunteerWorksOn (campaign, volunteer) VALUES (%s, %s)", (int(camp_id), int(vol_id)))
 		return
 
+	def insertActivity(self, activity_start, activity_end, activity_city, activity_address, activity_memo):
+				
+		cursor.execute("INSERT INTO Activities (startTime, endTime, city, address, memo) VALUES (%s, %s, %s, %s, %s)", (activity_start, activity_end, activity_city, activity_address, activity_memo))
+		dbconn.commit()
+		#cursor.execute("Select id from Volunteers where name=%s", (vol_name,))
+		#row = cursor.fetchall()
+		#vol_id = int(row[0][0])
+		#return vol_id
+		return
 
 #print report
 #input: list of rows, list of header fields
@@ -430,7 +439,7 @@ def addAnotherVolunteer():
 	if vol_continue == 'y':
 		os.system('clear')
 	elif vol_continue == 'n':
-		print 'Return to main menu.\n'
+		print 'Exiting.\n'
 		addVolunteerFlag = False
 	else:
 		print 'Improper input - exiting.\n'
@@ -493,17 +502,86 @@ def addVolunteer(campaign, camp_id):
 
 		showVolunteerList(campaign, camp_id)
 		addVolunteerFlag = addAnotherVolunteer()
+	return
+
+def addActivity(campaign, camp_id):
+	
+	addActivityFlag = True
+
+	#os.system('clear')
+	query_str = """
+	Would you like to add any activities (y/n)? \n 
+	"""
+	query_choice = raw_input(query_str)
+	if query_choice == 'n':
+		print "Exiting - no activities added.\n"
+		return
+	elif query_choice == 'y':
+		os.system('clear')
+	else:
+		print "Exiting - improper input.\n"	
+		return
+
+	while (addActivityFlag):
+		
+		#Add start	time	
+		start_str = """
+	Please enter the start time (YYYY-MM-DD HH:MM:SS): \n
+	"""
+		start_time = raw_input(start_str)
+
+		#Add end time
+		end_str = """
+	Please enter the end time (YYYY-MM-DD HH:MM:SS): \n
+	"""
+		end_time = raw_input(end_str)
+	
+		#Add city
+		city_str = """
+	Please enter the city (e.g., 'Victoria' or 'Nanaimo'): \n
+	"""
+		city = raw_input(city_str)
+
+		#Add address
+		address_str = """
+	Please enter the address (e.g., 'Main Street' or 'Centennial Square'): \n
+	"""
+		address = raw_input(address_str)
+
+		#Add memo (25 chars max)
+		memo_str = """
+	If desired, enter memo information (max 25 characters).
+	Otherwise, press return:  \n
+	"""
+		memo = raw_input(memo_str)
+
+		#try/except
+		#insert activity into Activities table
+		#insert acitivity and campaign in Includes table
+
+		campaign.insertActivity(start_time, end_time, city, address, memo)
+
+		#showVolunteerList(campaign, camp_id)
+		#addVolunteerFlag = addAnotherVolunteer()
+		addActivityFlag = False
+	return
 
 
 def menu2():
 	
 	#pass back values for campaign and camp_id
 	camp_list = addCampaign()
+	if(camp_list == None or camp_list[0] == None or camp_list[1] == None):
+		print "Error - Campaign not added.\n"
+		return
 	campaign = camp_list[0]
+	#print "Campaign type: %s" %type(campaign)
 	camp_id = camp_list[1]
+	#print "Campaign id type: %s" %type(camp_id)
 	addManager(campaign, camp_id)
 	addVolunteer(campaign, camp_id)
 	addActivity (campaign,camp_id)
+	return
 	
 def menu3():
 	print menu3
@@ -531,11 +609,11 @@ def testGraph():
 
 def main():
 	
-	startMenu()
+	#startMenu()
 
-	#campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
-	#camp_id = 5
-	#addVolunteer(campaign, camp_id)
+	campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
+	camp_id = 10
+	addActivity(campaign, camp_id)
 
 	cursor.close()
 	dbconn.close()
