@@ -327,11 +327,11 @@ def oldVolunteer(campaign, camp_id):
 	"""
 	vol_id = raw_input(vol_str)
 	
-	try:
-		campaign.insertVolunteerWorksOn(camp_id, vol_id)
-	except:
-		print "Insert volunteer failed.\n"
-		return
+	#try:
+	campaign.insertVolunteerWorksOn(camp_id, vol_id)
+	#except:
+		#print "Insert volunteer failed.\n"
+		#return
 	
 	confirmVolunteer()
 	return
