@@ -330,6 +330,7 @@ def oldVolunteer(campaign, camp_id):
 	try:
 		campaign.insertVolunteerWorksOn(camp_id, vol_id)
 	except:
+		dbconn.rollback()
 		print "Insert volunteer failed.\n"
 		return
 	
