@@ -2,9 +2,10 @@
 
 import psycopg2
 import psycopg2.errorcodes
+from psycopg2 import Date
 import os
 import sys
-#from ascii_graph import Pyasciigraph
+import datetime
 
 #global variables
 dbconn = psycopg2.connect(host='studentdb.csc.uvic.ca', user='c370_s09', password = 'o4OXQtB5')
@@ -687,6 +688,11 @@ def graph(header, rows, amount_field, tag_field):
 	#count = 0
 	values = []
 	labels = []
+	
+	if len(rows) <= 0:
+		print "%s - No data to print.\n" %header
+		return
+
 	for r in rows:
 		#need to hard code these - use class constants
 		values.append(r[amount_field])
@@ -714,7 +720,7 @@ def summary():
 	print "Enter summary.\n"
 	return
 
-def process_input(input_string):
+def processInput(input_string):
 	rows = []
 	try:
 		cursor.execute(input_string)
@@ -723,6 +729,29 @@ def process_input(input_string):
 		dbconn.rollback()
 		print "Error - could not return input for graph.\n"
 	return rows
+
+def getBalance(input_date):
+	#try/except
+	#get income
+
+	#SQL = "SELECT SUM(amount) FROM Donations WHERE donationdate <= date('2014-01-01')"
+	print "input_date type: %s" %type(input_date)
+	#SQL = "SELECT SUM(amount) FROM Donations WHERE donationdate <= convert(datetime, input_date)" %input_date 
+	sql = "Select sum(amount) from Donations where donationdate <= '%s'" %input_date
+	#date_str = str(date)
+	cursor.execute(sql)
+	rows = cursor.fetchall()
+	income = rows[0][0]
+	print "Income: %s" %income	
+	#get expenses
+	#dbconn.rollback()
+	sql2 = "Select sum(amount) from Expenses where expensedate <= '%s'" %input_date
+	cursor.execute(sql2)
+	rows2 = cursor.fetchall()
+	expenses = rows2[0][0]
+	print "Expenses: %s" %expenses
+	print "Balance: %s" %(income-expenses)	
+	return 
 
 def menu3():
 	#intro string - gives accounting information for any chosen time interval
@@ -745,11 +774,12 @@ def menu3():
 	donations_input = []
 	expenses_input = []
 
-	donations_str = 'Select * from Donations'
+	donations_str = "Select * from Donations where (donationdate >= '%s') and (donationdate <= '%s')" %(start_date, end_date)
+	#donations_str = "Select * from Donations where ((donationdate >= '%s') and (donationdate <= '%s')) group by donationdate)" %(start_date, end_date)
 	expenses_str = 'Select * from Expenses'
 
-	donations_input = process_input(donations_str)
-	expenses_input = process_input(expenses_str)
+	donations_input = processInput(donations_str)
+	expenses_input = processInput(expenses_str)
 	
 	#produce graph for Donations
 	graph("Donations", donations_input, DONATION_AMOUNT_FIELD, DONATION_TAG_FIELD)
@@ -757,6 +787,7 @@ def menu3():
 	graph("Expenses", expenses_input, EXPENSE_AMOUNT_FIELD, EXPENSE_TAG_FIELD)
 	
 	#starting account balance
+	start_balance = getBalance(start_date)
 	#text line - total income
 	#text line - total expenses
 	#text line - net amount for this interval: (income - expenses)
@@ -793,28 +824,8 @@ def main():
 	#camp_id = 5
 	#addActivity(campaign, camp_id)
 	
-	#count = 3
-	#max_value = 50
-	#values = [10, 30, 50]
-	#labels = ['ten', 'thirty', 'fifty']
-
-	#cursor.execute('Select * from Expenses')
-	#rows = cursor.fetchall()
-	#count = len(rows)
-	#count = 0
-	#values = []
-	#labels = []
-	#for r in rows:
-	#	if r[1] < 5000:
-	#		values.append(r[1])
-	#		labels.append(r[3])
-	#		count += 1
-#
-	#max_value = max(values)	
-#
-	#graph(count, max_value, values, labels)
-
 	menu3()
+	#getBalance('2014-01-01')
 
 	cursor.close()
 	dbconn.close()
