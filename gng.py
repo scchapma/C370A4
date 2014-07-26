@@ -265,6 +265,7 @@ def addCampaign():
 		campaign.insertCampaign()
 		cursor.execute("select * from Campaigns where name='%s'" %campaign.name)
 	except:
+		dbconn.rollback()
 		print "Insert campaign failed.\n"
 		return
 
@@ -324,13 +325,18 @@ def addManager(campaign, camp_id):
 	try:
 		campaign.insertManager(camp_id, int(manager_emp_id))
 	except:
+		dbconn.rollback()
 		print "Insert manager failed.\n"
 		return
 
 	#confirm that manager correct
-	cursor.execute("select name from Employees, Manages where id=manager and campaign=%d" %camp_id)
-	manager_str = cursor.fetchall()
-	print 'Campaign manager: %s' %manager_str[0]
+	try:
+		cursor.execute("select name from Employees, Manages where id=manager and campaign=%d" %camp_id)
+		manager_str = cursor.fetchall()
+		print 'Campaign manager: %s' %manager_str[0]
+	except:
+		dbconn.rollback()
+		print "Error - could not print campaign manager.\n"
 
 	manager_review_flag = True
 
@@ -349,6 +355,7 @@ def addManager(campaign, camp_id):
 			return
 		else:
 			print '\n\tImproper input - Manager not saved.\n'
+	return
 
 def confirmVolunteer():
 
@@ -391,11 +398,13 @@ def newVolunteer(campaign, camp_id):
 		cursor.execute("select name from Volunteers where name='%s'" %vol_name)
 		vol_name_str = cursor.fetchall()
 	except:
+		dbconn.rollback()
 		print "Error - could not return volunteer's name.\n"
 	try:
 		cursor.execute("select startdate from Volunteers where name='%s'" %vol_name)
 		vol_date_str = cursor.fetchall()
 	except:
+		dbconn.rollback()
 		print "Error - could not return volunteer's start date.\n"
 
 	print "\n\tVolunteer's name: %s" %vol_name_str[0]
@@ -456,6 +465,7 @@ def showVolunteerList(campaign, camp_id):
 		cursor.execute('Select * from (Volunteers join VolunteerWorksOn on id = volunteer) where campaign = %s', (int(camp_id),))
 		rows = cursor.fetchall()
 	except:
+		dbconn.rollback()
 		print "Print volunteer list failed.\n"
 	if (cursor.rowcount > 0): 
 		for x in range(0, len(rows[0])):
@@ -524,23 +534,24 @@ def showActivity(activity_id):
 		print "No activity added.\n"
 	return
 
-def showVolunteerList(campaign, camp_id):
+def showActivityList(camp_id):
 	rows = []
 	header = []
 	try:
-		cursor.execute('Select * from (Volunteers join VolunteerWorksOn on id = volunteer) where campaign = %s', (int(camp_id),))
+		cursor.execute('Select * from (Activities join Includes on id = activityid) where campaignid = %s', (int(camp_id),))
 		rows = cursor.fetchall()
 	except:
-		print "Print volunteer list failed.\n"
+		dbconn.rollback()
+		print "Print activity list failed.\n"
 	if (cursor.rowcount > 0): 
 		for x in range(0, len(rows[0])):
 			header.append(cursor.description[x].name)
-		print "\n\tVolunteers for this campaign: \n"
+		print "\n\tActivities for this campaign: \n"
 		printReport(header, rows)
 	else:
-		print "No volunteers have been added to this campaign.\n"
+		print "No activities have been added to this campaign.\n"
 	return
-	
+
 def confirmActivity(activity_id):
 
 	#print out report
@@ -641,12 +652,13 @@ def addActivity(campaign, camp_id):
 		try:
 			activity_id = campaign.insertActivity(start_time, end_time, city, address, memo, camp_id)
 		except:
+			dbconn.rollback()
 			print "Error - could not insert new activity.\n"
 
 		if (activity_id):
 			confirmActivity(activity_id)
 
-		#showVolunteerList(campaign, camp_id)
+		showActivityList(camp_id)
 		addActivityFlag = addAnotherActivity()
 	return
 
