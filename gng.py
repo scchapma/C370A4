@@ -15,6 +15,10 @@ NUM_CHOICES = 11
 AMOUNT_WIDTH = 50
 AMOUNT_TAG_WIDTH = 15
 MEMO_WIDTH = 15
+DONATION_AMOUNT_FIELD = 1
+DONATION_TAG_FIELD = 3
+EXPENSE_AMOUNT_FIELD = 1
+EXPENSE_TAG_FIELD = 3
 
 #git comment
 
@@ -678,10 +682,21 @@ def intro_menu3():
 	print "Welcome to menu 3 - accounting information.\n"
 	return
 
-def graph(count, max_value, values, labels):
-	print "Graph Header"
-	print '-'*80
-	for x in range(0, count):
+def graph(header, rows, amount_field, tag_field):
+	
+	#count = 0
+	values = []
+	labels = []
+	for r in rows:
+		#need to hard code these - use class constants
+		values.append(r[amount_field])
+		labels.append(r[tag_field])
+
+	max_value = max(values)	
+
+	print header
+	print '-'*85
+	for x in range(0, len(values)):
 		row_str = ''
 		unit = max_value/AMOUNT_WIDTH
 		units = (values[x]/unit)
@@ -696,6 +711,16 @@ def graph(count, max_value, values, labels):
 def summary():
 	print "Enter summary.\n"
 	return
+
+def rows(input_string):
+	rows = []
+	#try:
+	cursor.execute('Select * from Donations')
+	rows = cursor.fetchall()
+	#except:
+	#	dbconn.rollback()
+	#	print "Error - could not return input for graph.\n"
+	return rows
 
 def menu3():
 	#intro string - gives accounting information for any chosen time interval
@@ -716,13 +741,25 @@ def menu3():
 	#obtain input information for Donations - max, values, labels
 	#obtain input information for Contributions - max, values, labels
 	#obtain input information for Expenses - max, values, labels
+
+	donations_input = []
+	#contributions_input = []
+	expenses_input = []
+
+	donations_str = 'Select * from Donations'
+	#contributions_str = 'Select * from Contributions'
+	expenses_str = 'Select * from Expenses'
+
+	donations_input = rows(donations_str)
+	#contributions_input = rows(contributions_str)
+	expenses_input = rows(expenses_str)
 	
 	#produce graph for Donations
-	graph()
+	graph("Donations", donations_input, DONATION_AMOUNT_FIELD, DONATION_TAG_FIELD)
 	#produce graph for Contributions
-	graph()
+	#graph("Contributions", contributions_input)
 	#produce graph for Expenses
-	graph()
+	graph("Expenses", expenses_input, EXPENSE_AMOUNT_FIELD, EXPENSE_TAG_FIELD)
 	
 	#starting account balance
 	#text line - total income
@@ -766,21 +803,23 @@ def main():
 	#values = [10, 30, 50]
 	#labels = ['ten', 'thirty', 'fifty']
 
-	cursor.execute('Select * from Expenses')
-	rows = cursor.fetchall()
+	#cursor.execute('Select * from Expenses')
+	#rows = cursor.fetchall()
 	#count = len(rows)
-	count = 0
-	values = []
-	labels = []
-	for r in rows:
-		if r[1] < 5000:
-			values.append(r[1])
-			labels.append(r[3])
-			count += 1
+	#count = 0
+	#values = []
+	#labels = []
+	#for r in rows:
+	#	if r[1] < 5000:
+	#		values.append(r[1])
+	#		labels.append(r[3])
+	#		count += 1
+#
+	#max_value = max(values)	
+#
+	#graph(count, max_value, values, labels)
 
-	max_value = max(values)	
-
-	graph(count, max_value, values, labels)
+	menu3()
 
 	cursor.close()
 	dbconn.close()
