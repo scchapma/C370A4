@@ -618,13 +618,13 @@ def addActivity(campaign, camp_id):
 	
 		#Add city
 		city_str = """
-	Please enter the city (e.g., 'Victoria' or 'Nanaimo'): \n
+	Please enter the city (e.g., 'Victoria' or 'Nanaimo' - max 15 characters): \n
 	"""
 		city = raw_input(city_str)
 
 		#Add address
 		address_str = """
-	Please enter the address (e.g., 'Main Street' or 'Centennial Square'): \n
+	Please enter the address (e.g., 'Main Street' or 'Centennial Square' - max 20 characters): \n
 	"""
 		address = raw_input(address_str)
 
@@ -660,9 +660,7 @@ def menu2():
 		print "Error - Campaign not added.\n"
 		return
 	campaign = camp_list[0]
-	#print "Campaign type: %s" %type(campaign)
 	camp_id = camp_list[1]
-	#print "Campaign id type: %s" %type(camp_id)
 	addManager(campaign, camp_id)
 	addVolunteer(campaign, camp_id)
 	addActivity (campaign,camp_id)
