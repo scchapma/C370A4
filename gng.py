@@ -272,15 +272,6 @@ def addManager(campaign, camp_id):
 def confirmVolunteer():
 
 	#confirm that volunteer is correct
-	#***try/catch***
-	cursor.execute("select name from Volunteers where name='%s'" %vol_name)
-	vol_name_str = cursor.fetchall()
-	cursor.execute("select startdate from Volunteers where name='%s'" %vol_name)
-	vol_date_str = cursor.fetchall()
-
-	print "\n\tVolunteer's name: %s" %vol_name_str[0]
-	print "\tVolunteer's start date: %s\n" %vol_date_str[0]
-
 	vol_info_str = """
 	Is this information correct? (y/n)? \n
 	"""
@@ -313,6 +304,15 @@ def newVolunteer(campaign, camp_id):
 	except:
 		print "Insert new volunteer failed.\n"
 		return
+
+	#***try/catch***
+	cursor.execute("select name from Volunteers where name='%s'" %vol_name)
+	vol_name_str = cursor.fetchall()
+	cursor.execute("select startdate from Volunteers where name='%s'" %vol_name)
+	vol_date_str = cursor.fetchall()
+
+	print "\n\tVolunteer's name: %s" %vol_name_str[0]
+	print "\tVolunteer's start date: %s\n" %vol_date_str[0]
 
 	confirmVolunteer()
 	return
