@@ -28,10 +28,7 @@ class Campaign:
 		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
 
 	def insertManager(self, campaign_id, employee_id):
-		#get campaign id#	
-		#get manager's employee number or report invalid
-		#insert try/catch
-
+		
 		cursor.execute("INSERT INTO Manages (campaign, manager) VALUES (%d, %d)" %(campaign_id, employee_id))
 		#cursor.execute("select * from Manages where campaign='%s'" %str(campaign_id))
 		#dbconn.commit()
@@ -49,8 +46,6 @@ class Campaign:
 		cursor.execute("INSERT INTO VolunteerWorksOn (campaign, volunteer) VALUES (%s, %s)", (int(camp_id), int(vol_id)))
 		return
 
-	#def insertVolunteer(self, vol_id):
-		#return
 
 #print report
 #input: list of rows, list of header fields
@@ -308,11 +303,16 @@ def newVolunteer(campaign, camp_id):
 		print "Insert new volunteer failed.\n"
 		return
 
-	#***try/catch***
-	cursor.execute("select name from Volunteers where name='%s'" %vol_name)
-	vol_name_str = cursor.fetchall()
-	cursor.execute("select startdate from Volunteers where name='%s'" %vol_name)
-	vol_date_str = cursor.fetchall()
+	try:
+		cursor.execute("select name from Volunteers where name='%s'" %vol_name)
+		vol_name_str = cursor.fetchall()
+	except:
+		print "Error - could not return volunteer's name.\n"
+	try:
+		cursor.execute("select startdate from Volunteers where name='%s'" %vol_name)
+		vol_date_str = cursor.fetchall()
+	except:
+		print "Error - could not return volunteer's start date.\n"
 
 	print "\n\tVolunteer's name: %s" %vol_name_str[0]
 	print "\tVolunteer's start date: %s\n" %vol_date_str[0]
