@@ -760,10 +760,26 @@ def main():
 	#campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
 	#camp_id = 5
 	#addActivity(campaign, camp_id)
-	count = 3
-	max_value = 50
-	values = [10, 30, 50]
-	labels = ['ten', 'thirty', 'fifty']
+	
+	#count = 3
+	#max_value = 50
+	#values = [10, 30, 50]
+	#labels = ['ten', 'thirty', 'fifty']
+
+	cursor.execute('Select * from Expenses')
+	rows = cursor.fetchall()
+	#count = len(rows)
+	count = 0
+	values = []
+	labels = []
+	for r in rows:
+		if r[1] < 5000:
+			values.append(r[1])
+			labels.append(r[3])
+			count += 1
+
+	max_value = max(values)	
+
 	graph(count, max_value, values, labels)
 
 	cursor.close()
