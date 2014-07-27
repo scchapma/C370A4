@@ -774,14 +774,19 @@ def getBalance(input_date):
 		dbconn.rollback()
 		print "Error - could not obtain current balance.\n"
 	
-	#balance string
 	balance = income - expenses
+	return balance
+
+def printBalance(balance, input_date):
+
+	#balance string
 	balance_header_str = "Balance at %s: " %(input_date)
 	balance_value_str = "$%d\n" %(balance,)	
 	balance_str = balance_header_str.ljust(ACCT_HEADER_WIDTH)
 	balance_str += balance_value_str.rjust(ACCT_VALUE_WIDTH)
 	print balance_str
 	return 
+
 
 def getIncome(input_date):
 	
@@ -823,11 +828,12 @@ def accountSummary(start_date, end_date):
 	header_str = '-'*len(intro_str)
 	header_str += '\n'
 	print header_str
-	start_date = modifyDate(start_date)
-	getBalance(start_date)
+	new_start_date = modifyDate(start_date)
+	start_balance = getBalance(new_start_date)
+	printBalance(start_balance, start_date)
 
 	#income string
-	income = getIncome(end_date) - getIncome(start_date)	
+	income = getIncome(end_date) - getIncome(new_start_date)	
 	income_header_str = "Total income for this period: "
 	income_value_str = "$%s\n" %income
 	income_str = income_header_str.ljust(ACCT_HEADER_WIDTH)
@@ -835,7 +841,7 @@ def accountSummary(start_date, end_date):
 	print income_str
 		
 	#expenses string
-	expenses = getExpenses(end_date) - getExpenses(start_date)
+	expenses = getExpenses(end_date) - getExpenses(new_start_date)
 	expenses_header_str = "Total expenses for this period: "
 	expenses_value_str = "$%s\n" %expenses
 	expenses_str = expenses_header_str.ljust(ACCT_HEADER_WIDTH)
@@ -850,7 +856,8 @@ def accountSummary(start_date, end_date):
 	net_income_str += net_income_value_str.rjust(ACCT_VALUE_WIDTH)
 	print net_income_str
 
-	getBalance(end_date)
+	end_balance = getBalance(end_date)
+	printBalance(end_balance, end_date)
 	return
 
 def modifyDate(start_date):
