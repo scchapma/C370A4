@@ -732,29 +732,46 @@ def getBalance(input_date):
 
 	#SQL = "SELECT SUM(amount) FROM Donations WHERE donationdate <= date('2014-01-01')"
 	#SQL = "SELECT SUM(amount) FROM Donations WHERE donationdate <= convert(datetime, input_date)" %input_date 
+	income = 0
+	expenses = 0
 	sql = "Select sum(amount) from Donations where donationdate <= '%s'" %input_date
 	#date_str = str(date)
-	try:
-		cursor.execute(sql)
-		rows = cursor.fetchall()
+	#try:
+	cursor.execute(sql)
+	rows = cursor.fetchall()
+	print "Row Count: %s" %cursor.rowcount
+	if rows[0][0] == None:
+		print "Sum(amount) is NULL.\n"
+	elif cursor.rowcount <= 0:
+		income = 0
+	else:
 		income = rows[0][0]
-	except:
-		dbconn.rollback()
-		print "Error - could not obtain current balance.\n"
-		return
+	print "Income: %d\n" %income
+	#except:
+	#	dbconn.rollback()
+	#	print "Error - could not obtain current balance.\n"
+	#	return
 	#get expenses
 	sql2 = "Select sum(amount) from Expenses where expensedate <= '%s'" %input_date
 	try:
 		cursor.execute(sql2)
 		rows2 = cursor.fetchall()
-		expenses = rows2[0][0]
+		if rows2[0][0] == None:
+			print "Sum(amount) is NULL.\n"
+		elif cursor.rowcount <= 0:
+			expenses = 0
+		else:
+			expenses = rows2[0][0]
+		print "Expenses: %d\n" %expenses
 	except:
 		dbconn.rollback()
 		print "Error - could not obtain current balance.\n"
-	print "Balance at %s: $%s" %(input_date, income-expenses)	
+	
+	balance = income - expenses
+	print "Balance at %s: $%d" %(input_date, balance)	
 	return 
 
-def getIncome(input_date):
+def getIncome(start_date, end_date):
 	sql = "Select sum(amount) from Donations where donationdate <= '%s'" %input_date
 	cursor.execute(sql)
 	rows = cursor.fetchall()
@@ -762,7 +779,7 @@ def getIncome(input_date):
 	print "Income: $%s" %income
 	return income
 
-def getExpenses(input_date):
+def getExpenses(start_date, end_date):
 	sql = "Select sum(amount) from Expenses where expensedate <= '%s'" %input_date
 	cursor.execute(sql)
 	row = cursor.fetchall()
@@ -772,6 +789,7 @@ def getExpenses(input_date):
 
 def accountSummary(start_date, end_date):
 	print "Accounting Summary: \n"
+	start_date = modifyDate(start_date)
 	getBalance(start_date)
 	#text line - total income
 	income = getIncome(end_date) - getIncome(start_date)
@@ -784,6 +802,12 @@ def accountSummary(start_date, end_date):
 	print "Net income for this period: %s" %(net_income)
 	getBalance(end_date)
 
+def modifyDate(start_date):
+	Date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+	EndDate = Date - datetime.timedelta(days=1)
+	end_date = EndDate.strftime("%Y-%m-%d")
+	print "End date: %s" %end_date
+	return end_date
 
 def menu3():
 	#intro string - gives accounting information for any chosen time interval
@@ -851,10 +875,9 @@ def main():
 	#addActivity(campaign, camp_id)
 	
 	menu3()
-	#accountSummary('2014-01-01', '2014-01-01')
-	#date = '2014-01-01'
-	#getIncome(date)
-	#getExpenses(date)
+
+	#input_date = modifyDate('2013-03-16')
+	#getBalance(input_date)
 
 	cursor.close()
 	dbconn.close()
