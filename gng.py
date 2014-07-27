@@ -88,6 +88,8 @@ def printReport(header, rows):
 			#set header width to max of baseline header field and max length of columns
 			if len(str(r[x])) > col_widths[x]:
 				col_widths[x] = len(str(r[x]))
+			#add padding
+			col_widths[x] += 1
 
 	#print header
 	header_str = ''
@@ -906,7 +908,54 @@ def menu3():
 	accountSummary(start_date, end_date)
 	return
 
+def volunteerHistory():
+	
+	#return list of volunteers by id number
+	sql1 = "Select id from Volunteers"
+	cursor.execute(sql1)
+	rows = cursor.fetchall()
+
+	for r in rows:
+		value_str = str(r[0])
+
+		#get name
+		name_query = "Select name from Volunteers where id = %s"
+		cursor.execute(name_query, value_str)
+		names = cursor.fetchall()
+		name = names[0]
+		print "Report for %s\n" %name 
+
+		sql2 = "Select name, id, startdate, enddate  from Campaigns, (select campaign from VolunteerWorksOn where volunteer = %s) V1C where Campaigns.id = V1C.campaign"
+		cursor.execute(sql2, value_str)
+		rows2 = cursor.fetchall()
+		header = ["Campaigns", "ID", "Start", "End"]
+		printReport(header, rows2) 	
+
+	#print rows
+	#iterate over volunteer number to return volMemo and campaign history (including campaign memo)
+	#print report for each volunteer and disply to user
+
+def addCampaignMemo():
+
+	#prompt user to enter 
+	return
+
+def addVolunteerMemo():
+
+	return
+
 def menu4():
+	#menu options - review volunteers, add memo to campaign or volunteer
+	#query - print out List of campaigns by volunteer
+
+	print "Gary Gold: \n"
+
+	sql = "Select name, id, startdate, enddate  from Campaigns, (select campaign from VolunteerWorksOn where volunteer = 1) V1C where Campaigns.id = V1C.campaign"
+	cursor.execute(sql)
+	rows = cursor.fetchall()
+	header = ["Campaigns", "ID", "Start", "End"]
+	printReport(header, rows) 
+
 	print menu4
 
 def menu5():
@@ -914,11 +963,14 @@ def menu5():
 
 def main():
 	
-	startMenu()
+	#startMenu()
 
 	#campaign = Campaign('Steve', '2014-02-24', '2014-03-17')
 	#camp_id = 5
 	#addActivity(campaign, camp_id)
+
+	#menu4()
+	volunteerHistory()
 
 	cursor.close()
 	dbconn.close()
