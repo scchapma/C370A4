@@ -726,14 +726,15 @@ def processInput(input_string):
 		print "Error - could not return input for graph.\n"
 	return rows
 
-def getBalance(input_date):
-	
-	#get income
+def getBalance(input_date):	
 
 	#SQL = "SELECT SUM(amount) FROM Donations WHERE donationdate <= date('2014-01-01')"
 	#SQL = "SELECT SUM(amount) FROM Donations WHERE donationdate <= convert(datetime, input_date)" %input_date 
+	
 	income = 0
 	expenses = 0
+
+	#get income
 	sql = "Select sum(amount) from Donations where donationdate <= '%s'" %input_date
 	try:
 		cursor.execute(sql)
@@ -772,8 +773,8 @@ def getBalance(input_date):
 def getIncome(input_date):
 	
 	income = 0
-	
 	sql = "Select sum(amount) from Donations where donationdate <= '%s'" %input_date
+	
 	try:
 		cursor.execute(sql)
 		rows = cursor.fetchall()
@@ -788,9 +789,9 @@ def getIncome(input_date):
 
 def getExpenses(input_date):
 	
-	expenses = 0
-	
+	expenses = 0	
 	sql = "Select sum(amount) from Expenses where expensedate <= '%s'" %input_date
+	
 	try:
 		cursor.execute(sql)
 		row = cursor.fetchall()
@@ -848,7 +849,8 @@ def menu3():
 
 	donations_str = "Select * from Donations where (donationdate >= '%s') and (donationdate <= '%s')" %(start_date, end_date)
 	#donations_str = "Select * from Donations where ((donationdate >= '%s') and (donationdate <= '%s')) group by donationdate)" %(start_date, end_date)
-	expenses_str = 'Select * from Expenses'
+	expenses_str = "Select * from Expenses where (expensedate >= '%s') and (expensedate <= '%s')" %(start_date, end_date)
+	#expenses_str = 'Select * from Expenses'
 
 	donations_input = processInput(donations_str)
 	expenses_input = processInput(expenses_str)
