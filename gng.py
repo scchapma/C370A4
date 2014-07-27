@@ -735,78 +735,94 @@ def getBalance(input_date):
 	income = 0
 	expenses = 0
 	sql = "Select sum(amount) from Donations where donationdate <= '%s'" %input_date
-	#date_str = str(date)
-	#try:
-	cursor.execute(sql)
-	rows = cursor.fetchall()
-	print "Row Count: %s" %cursor.rowcount
-	if rows[0][0] == None:
-		print "Sum(amount) is NULL.\n"
-	elif cursor.rowcount <= 0:
-		income = 0
-	else:
-		income = rows[0][0]
-	print "Income: %d\n" %income
-	#except:
-	#	dbconn.rollback()
-	#	print "Error - could not obtain current balance.\n"
-	#	return
+	try:
+		cursor.execute(sql)
+		rows = cursor.fetchall()
+		if rows[0][0] == None:
+			#print "No donations to date.\n"
+			pass
+		elif cursor.rowcount <= 0:
+			print "Error - no sum returned from Donations.\n"
+		else:
+			income = rows[0][0]
+	except:
+		dbconn.rollback()
+		print "Error - could not obtain current balance.\n"
+
 	#get expenses
 	sql2 = "Select sum(amount) from Expenses where expensedate <= '%s'" %input_date
 	try:
 		cursor.execute(sql2)
 		rows2 = cursor.fetchall()
 		if rows2[0][0] == None:
-			print "Sum(amount) is NULL.\n"
+			#print "No expenses to date.\n"
+			pass
 		elif cursor.rowcount <= 0:
-			expenses = 0
+			print "Error - no sum returned from Expenses.\n"
 		else:
 			expenses = rows2[0][0]
-		print "Expenses: %d\n" %expenses
 	except:
 		dbconn.rollback()
 		print "Error - could not obtain current balance.\n"
 	
 	balance = income - expenses
-	print "Balance at %s: $%d" %(input_date, balance)	
+	print "Balance at %s: $%d\n" %(input_date, balance)	
 	return 
 
-def getIncome(start_date, end_date):
+def getIncome(input_date):
+	
+	income = 0
+	
 	sql = "Select sum(amount) from Donations where donationdate <= '%s'" %input_date
-	cursor.execute(sql)
-	rows = cursor.fetchall()
-	income = rows[0][0]
-	print "Income: $%s" %income
+	try:
+		cursor.execute(sql)
+		rows = cursor.fetchall()
+		income = rows[0][0]
+		if income == None:
+			income = 0
+		#print "Income: $%s" %income
+	except:
+		print "Error - could not return income for this period.\n"
+		return income
 	return income
 
-def getExpenses(start_date, end_date):
+def getExpenses(input_date):
+	
+	expenses = 0
+	
 	sql = "Select sum(amount) from Expenses where expensedate <= '%s'" %input_date
-	cursor.execute(sql)
-	row = cursor.fetchall()
-	expenses = row[0][0]
-	print "Expenses: $%s" %expenses
+	try:
+		cursor.execute(sql)
+		row = cursor.fetchall()
+		expenses = row[0][0]
+		if expenses == None:
+			expenses = 0
+		#print "Expenses: $%s" %expenses
+	except:
+		print "Error - could not return expenses for this period.\n"
+		return expenses
 	return expenses
 
 def accountSummary(start_date, end_date):
-	print "Accounting Summary: \n"
+	intro_str = "\nAccounting Summary: "
+	print intro_str
+	header_str = '-'*len(intro_str)
+	header_str += '\n'
+	print header_str
 	start_date = modifyDate(start_date)
 	getBalance(start_date)
-	#text line - total income
 	income = getIncome(end_date) - getIncome(start_date)
-	print "Total income for this period: %s\n" %income
-	#text line - total expenses
+	print "Total income for this period: $%s\n" %income
 	expenses = getExpenses(end_date) - getExpenses(start_date)
-	print "Total expenses for this period: %s\n" %expenses
-	#text line - net amount for this interval: (income - expenses)
+	print "Total expenses for this period: $%s\n" %expenses
 	net_income = income - expenses
-	print "Net income for this period: %s" %(net_income)
+	print "Net income for this period: $%s\n" %(net_income)
 	getBalance(end_date)
 
 def modifyDate(start_date):
 	Date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
 	EndDate = Date - datetime.timedelta(days=1)
 	end_date = EndDate.strftime("%Y-%m-%d")
-	print "End date: %s" %end_date
 	return end_date
 
 def menu3():
