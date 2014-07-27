@@ -39,36 +39,36 @@ class Campaign:
 
 	def insertCampaign(self):
 		#insert try/catch
-		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", (self.name, self.start_date, self.end_date))
+		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", [self.name, self.start_date, self.end_date])
 
 	def insertManager(self, campaign_id, employee_id):
 		
-		cursor.execute("INSERT INTO Manages (campaign, manager) VALUES (%d, %d)" %(campaign_id, employee_id))
+		cursor.execute("INSERT INTO Manages (campaign, manager) VALUES (%s, %s)", [campaign_id, employee_id])
 		#cursor.execute("select * from Manages where campaign='%s'" %str(campaign_id))
 		#dbconn.commit()
 
 	def insertNewVolunteer(self, vol_name, vol_start_date):
 				
-		cursor.execute("INSERT INTO Volunteers (name, startDate, seniorVolunteer) VALUES (%s, %s, False)", (vol_name, vol_start_date))
+		cursor.execute("INSERT INTO Volunteers (name, startDate, seniorVolunteer) VALUES (%s, %s, False)", [vol_name, vol_start_date])
 		#change to select max id
-		cursor.execute("Select id from Volunteers where name=%s", (vol_name,))
+		cursor.execute("Select id from Volunteers where name=%s", [vol_name])
 		row = cursor.fetchall()
 		vol_id = int(row[0][0])
 		return vol_id
 
 	def insertVolunteerWorksOn(self, camp_id, vol_id):
 
-		cursor.execute("INSERT INTO VolunteerWorksOn (campaign, volunteer) VALUES (%s, %s)", (int(camp_id), int(vol_id)))
+		cursor.execute("INSERT INTO VolunteerWorksOn (campaign, volunteer) VALUES (%s, %s)", [int(camp_id), int(vol_id)])
 		return
 
 	def insertActivity(self, activity_start, activity_end, activity_city, activity_address, activity_memo, camp_id):
 				
-		cursor.execute("INSERT INTO Activities (startTime, endTime, city, address, memo) VALUES (%s, %s, %s, %s, %s)", (activity_start, activity_end, activity_city, activity_address, activity_memo))
+		cursor.execute("INSERT INTO Activities (startTime, endTime, city, address, memo) VALUES (%s, %s, %s, %s, %s)", [activity_start, activity_end, activity_city, activity_address, activity_memo])
 		#obtain Activity ID
 		cursor.execute("Select max(id) from Activities")
 		row = cursor.fetchall()
 		activity_id = int(row[0][0])
-		cursor.execute("INSERT INTO Includes VALUES (%d, %d)" %(int(camp_id), activity_id))
+		cursor.execute("INSERT INTO Includes VALUES (%s, %s)", [int(camp_id), activity_id])
 		#dbconn.commit()
 		return activity_id
 
@@ -213,7 +213,7 @@ def menu1():
 
 					print "\n\tData for query %s:\n " %menu1_use_choice
 					try: 
-						cursor.execute('select * from question%s' %menu1_use_choice)
+						cursor.execute('select * from question%s', [menu1_use_choice])
 						rows = cursor.fetchall()
 						header = []
 						#what if rows = 0?
@@ -270,7 +270,7 @@ def addCampaign():
 	
 	try:
 		campaign.insertCampaign()
-		cursor.execute("select * from Campaigns where name='%s'" %campaign.name)
+		cursor.execute("select * from Campaigns where name=%s", [campaign.name])
 	except:
 		dbconn.rollback()
 		print "Insert campaign failed.\n"
@@ -339,7 +339,7 @@ def addManager(campaign, camp_id):
 
 	#confirm that manager correct
 	try:
-		cursor.execute("select name from Employees, Manages where id=manager and campaign=%d" %camp_id)
+		cursor.execute("select name from Employees, Manages where id=manager and campaign=%s", [camp_id])
 		manager_str = cursor.fetchall()
 		print 'Campaign manager: %s' %manager_str[0]
 	except:
@@ -403,17 +403,19 @@ def newVolunteer(campaign, camp_id):
 		return
 
 	try:
-		cursor.execute("select name from Volunteers where name='%s'" %vol_name)
+		cursor.execute("select name from Volunteers where name=%s", [vol_name])
 		vol_name_str = cursor.fetchall()
 	except:
 		dbconn.rollback()
 		print "Error - could not return volunteer's name.\n"
+		return
 	try:
-		cursor.execute("select startdate from Volunteers where name='%s'" %vol_name)
+		cursor.execute("select startdate from Volunteers where name=%s", [vol_name])
 		vol_date_str = cursor.fetchall()
 	except:
 		dbconn.rollback()
 		print "Error - could not return volunteer's start date.\n"
+		return
 
 	print "\n\tVolunteer's name: %s" %vol_name_str[0]
 	print "\tVolunteer's start date: %s\n" %vol_date_str[0]
@@ -435,7 +437,7 @@ def oldVolunteer(campaign, camp_id):
 	try:
 		campaign.insertVolunteerWorksOn(camp_id, vol_id)
 		#confirm that manager correct
-		cursor.execute("select name from Volunteers where id=%d" %int(vol_id))
+		cursor.execute("select name from Volunteers where id=%s", [int(vol_id)])
 		old_vol_str = cursor.fetchall()
 	except:
 		dbconn.rollback()
@@ -470,7 +472,7 @@ def showVolunteerList(campaign, camp_id):
 	rows = []
 	header = []
 	try:
-		cursor.execute('Select * from (Volunteers join VolunteerWorksOn on id = volunteer) where campaign = %s', (int(camp_id),))
+		cursor.execute('Select * from (Volunteers join VolunteerWorksOn on id = volunteer) where campaign = %s', [int(camp_id)])
 		rows = cursor.fetchall()
 	except:
 		dbconn.rollback()
@@ -528,7 +530,7 @@ def showActivity(activity_id):
 	rows = []
 	header = []
 	try:
-		cursor.execute("Select * from Activities where id=%d" %(int(activity_id)))
+		cursor.execute("Select * from Activities where id=%s", [int(activity_id)])
 		rows = cursor.fetchall()
 	except:
 		dbconn.rollback()
@@ -546,7 +548,7 @@ def showActivityList(camp_id):
 	rows = []
 	header = []
 	try:
-		cursor.execute('Select * from (Activities join Includes on id = activityid) where campaignid = %s', (int(camp_id),))
+		cursor.execute('Select * from (Activities join Includes on id = activityid) where campaignid = %s', [int(camp_id)])
 		rows = cursor.fetchall()
 	except:
 		dbconn.rollback()
@@ -913,7 +915,7 @@ def main():
 	
 	startMenu()
 
-	#campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
+	#campaign = Campaign('Steve', '2014-02-24', '2014-03-17')
 	#camp_id = 5
 	#addActivity(campaign, camp_id)
 
