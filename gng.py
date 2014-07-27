@@ -889,16 +889,12 @@ def menu3():
 	"""
 	end_date = raw_input(end_str)
 
-	#obtain input information for Donations 
-	#obtain input information for Expenses - max, values, labels
 	donations_input = []
 	expenses_input = []
 
 	donations_str = "Select * from Donations where (donationdate >= '%s') and (donationdate <= '%s')" %(start_date, end_date)
-	#donations_str = "Select * from Donations where ((donationdate >= '%s') and (donationdate <= '%s')) group by donationdate)" %(start_date, end_date)
 	expenses_str = "Select * from Expenses where (expensedate >= '%s') and (expensedate <= '%s')" %(start_date, end_date)
-	#expenses_str = 'Select * from Expenses'
-
+	
 	donations_input = processInput(donations_str)
 	expenses_input = processInput(expenses_str)
 	
