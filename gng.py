@@ -13,6 +13,8 @@ cursor = dbconn.cursor()
 
 #class constants
 NUM_CHOICES = 11
+
+#class constants - graph
 AMOUNT_WIDTH = 50
 AMOUNT_TAG_WIDTH = 15
 MEMO_WIDTH = 15
@@ -20,6 +22,10 @@ DONATION_AMOUNT_FIELD = 1
 DONATION_TAG_FIELD = 3
 EXPENSE_AMOUNT_FIELD = 1
 EXPENSE_TAG_FIELD = 3
+
+#class constants - accounting summary
+ACCT_HEADER_WIDTH = 40
+ACCT_VALUE_WIDTH = 10
 
 #git comment
 
@@ -296,6 +302,7 @@ def addCampaign():
 		if (campaign_review_choice == 'y'):
 			camp_id = rows[0][0]
 			dbconn.commit()
+			os.system('clear')
 			print '\n\tChanges committed.\n'
 			review_flag = False
 		elif(campaign_review_choice == 'n'):
@@ -680,6 +687,7 @@ def menu2():
 	return
 	
 def intro_menu3():
+	os.system('clear')
 	print "Welcome to menu 3 - accounting information.\n"
 	return
 
@@ -690,7 +698,7 @@ def graph(header, rows, amount_field, tag_field):
 	labels = []
 	
 	if len(rows) <= 0:
-		print "%s - No data to print.\n" %header
+		print "\n\n\n%s - No data to print.\n" %header
 		return
 
 	for r in rows:
@@ -766,8 +774,13 @@ def getBalance(input_date):
 		dbconn.rollback()
 		print "Error - could not obtain current balance.\n"
 	
+	#balance string
 	balance = income - expenses
-	print "Balance at %s: $%d\n" %(input_date, balance)	
+	balance_header_str = "Balance at %s: " %(input_date)
+	balance_value_str = "$%d\n" %(balance,)	
+	balance_str = balance_header_str.ljust(ACCT_HEADER_WIDTH)
+	balance_str += balance_value_str.rjust(ACCT_VALUE_WIDTH)
+	print balance_str
 	return 
 
 def getIncome(input_date):
@@ -805,20 +818,40 @@ def getExpenses(input_date):
 	return expenses
 
 def accountSummary(start_date, end_date):
-	intro_str = "\nAccounting Summary: "
+	intro_str = "\n\n\nAccounting Summary: "
 	print intro_str
 	header_str = '-'*len(intro_str)
 	header_str += '\n'
 	print header_str
 	start_date = modifyDate(start_date)
 	getBalance(start_date)
-	income = getIncome(end_date) - getIncome(start_date)
-	print "Total income for this period: $%s\n" %income
+
+	#income string
+	income = getIncome(end_date) - getIncome(start_date)	
+	income_header_str = "Total income for this period: "
+	income_value_str = "$%s\n" %income
+	income_str = income_header_str.ljust(ACCT_HEADER_WIDTH)
+	income_str += income_value_str.rjust(ACCT_VALUE_WIDTH)
+	print income_str
+		
+	#expenses string
 	expenses = getExpenses(end_date) - getExpenses(start_date)
-	print "Total expenses for this period: $%s\n" %expenses
+	expenses_header_str = "Total expenses for this period: "
+	expenses_value_str = "$%s\n" %expenses
+	expenses_str = expenses_header_str.ljust(ACCT_HEADER_WIDTH)
+	expenses_str += expenses_value_str.rjust(ACCT_VALUE_WIDTH)
+	print expenses_str
+
+	#net income string
 	net_income = income - expenses
-	print "Net income for this period: $%s\n" %(net_income)
+	net_income_header_str = "Net income for this period: "
+	net_income_value_str = "$%s\n" %net_income
+	net_income_str = net_income_header_str.ljust(ACCT_HEADER_WIDTH)
+	net_income_str += net_income_value_str.rjust(ACCT_VALUE_WIDTH)
+	print net_income_str
+
 	getBalance(end_date)
+	return
 
 def modifyDate(start_date):
 	Date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
@@ -869,33 +902,13 @@ def menu4():
 def menu5():
 	print menu5
 
-def testGraph():
-
-	cursor.execute("""
-	select *
-	from Expenses 
-	""")
-
-	expenses = []
-	for row in cursor.fetchall():
-		expenses.append(row[3], row[1])
-
-	graph = Pyasciigraph()
-	for line in  graph.graph('Expenses', expenses):
-   		print(line)
-
 def main():
 	
-	#startMenu()
+	startMenu()
 
 	#campaign = Campaign('Steve', 2014-02-24, 2014-03-17)
 	#camp_id = 5
 	#addActivity(campaign, camp_id)
-	
-	menu3()
-
-	#input_date = modifyDate('2013-03-16')
-	#getBalance(input_date)
 
 	cursor.close()
 	dbconn.close()
