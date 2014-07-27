@@ -38,7 +38,7 @@ class Campaign:
 		self.end_date = end_date
 
 	def insertCampaign(self):
-		#insert try/catch
+		
 		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", [self.name, self.start_date, self.end_date])
 
 	def insertManager(self, campaign_id, employee_id):
@@ -265,8 +265,6 @@ def addCampaign():
 	#check for proper format
 
 	campaign = Campaign(campaign_name, start_date, end_date)
-
-	###need try/catch here in case Date (or other field) not properly formed###
 	
 	try:
 		campaign.insertCampaign()
@@ -345,6 +343,7 @@ def addManager(campaign, camp_id):
 	except:
 		dbconn.rollback()
 		print "Error - could not print campaign manager.\n"
+		return
 
 	manager_review_flag = True
 
@@ -477,6 +476,7 @@ def showVolunteerList(campaign, camp_id):
 	except:
 		dbconn.rollback()
 		print "Print volunteer list failed.\n"
+		return
 	if (cursor.rowcount > 0): 
 		for x in range(0, len(rows[0])):
 			header.append(cursor.description[x].name)
@@ -535,6 +535,7 @@ def showActivity(activity_id):
 	except:
 		dbconn.rollback()
 		print "Print activity failed.\n"
+		return
 	if (cursor.rowcount > 0): 
 		for x in range(0, len(rows[0])):
 			header.append(cursor.description[x].name)
@@ -553,6 +554,7 @@ def showActivityList(camp_id):
 	except:
 		dbconn.rollback()
 		print "Print activity list failed.\n"
+		return
 	if (cursor.rowcount > 0): 
 		for x in range(0, len(rows[0])):
 			header.append(cursor.description[x].name)
@@ -743,6 +745,7 @@ def getBalance(input_date):
 	
 	income = 0
 	expenses = 0
+	balance = 0
 
 	#get income
 	sql = "Select sum(amount) from Donations where donationdate <= '%s'" %input_date
@@ -759,6 +762,7 @@ def getBalance(input_date):
 	except:
 		dbconn.rollback()
 		print "Error - could not obtain current balance.\n"
+		return balance
 
 	#get expenses
 	sql2 = "Select sum(amount) from Expenses where expensedate <= '%s'" %input_date
@@ -775,6 +779,7 @@ def getBalance(input_date):
 	except:
 		dbconn.rollback()
 		print "Error - could not obtain current balance.\n"
+		return balance
 	
 	balance = income - expenses
 	return balance
