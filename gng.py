@@ -716,10 +716,6 @@ def graph(header, rows, amount_field, tag_field):
 		print row_str
 	return
 
-def summary():
-	print "Enter summary.\n"
-	return
-
 def processInput(input_string):
 	rows = []
 	try:
@@ -731,27 +727,63 @@ def processInput(input_string):
 	return rows
 
 def getBalance(input_date):
-	#try/except
+	
 	#get income
 
 	#SQL = "SELECT SUM(amount) FROM Donations WHERE donationdate <= date('2014-01-01')"
-	print "input_date type: %s" %type(input_date)
 	#SQL = "SELECT SUM(amount) FROM Donations WHERE donationdate <= convert(datetime, input_date)" %input_date 
 	sql = "Select sum(amount) from Donations where donationdate <= '%s'" %input_date
 	#date_str = str(date)
+	try:
+		cursor.execute(sql)
+		rows = cursor.fetchall()
+		income = rows[0][0]
+	except:
+		dbconn.rollback()
+		print "Error - could not obtain current balance.\n"
+		return
+	#get expenses
+	sql2 = "Select sum(amount) from Expenses where expensedate <= '%s'" %input_date
+	try:
+		cursor.execute(sql2)
+		rows2 = cursor.fetchall()
+		expenses = rows2[0][0]
+	except:
+		dbconn.rollback()
+		print "Error - could not obtain current balance.\n"
+	print "Balance at %s: $%s" %(input_date, income-expenses)	
+	return 
+
+def getIncome(input_date):
+	sql = "Select sum(amount) from Donations where donationdate <= '%s'" %input_date
 	cursor.execute(sql)
 	rows = cursor.fetchall()
 	income = rows[0][0]
-	print "Income: %s" %income	
-	#get expenses
-	#dbconn.rollback()
-	sql2 = "Select sum(amount) from Expenses where expensedate <= '%s'" %input_date
-	cursor.execute(sql2)
-	rows2 = cursor.fetchall()
-	expenses = rows2[0][0]
-	print "Expenses: %s" %expenses
-	print "Balance: %s" %(income-expenses)	
-	return 
+	print "Income: $%s" %income
+	return income
+
+def getExpenses(input_date):
+	sql = "Select sum(amount) from Expenses where expensedate <= '%s'" %input_date
+	cursor.execute(sql)
+	row = cursor.fetchall()
+	expenses = row[0][0]
+	print "Expenses: $%s" %expenses
+	return expenses
+
+def accountSummary(start_date, end_date):
+	print "Accounting Summary: \n"
+	getBalance(start_date)
+	#text line - total income
+	income = getIncome(end_date) - getIncome(start_date)
+	print "Total income for this period: %s\n" %income
+	#text line - total expenses
+	expenses = getExpenses(end_date) - getExpenses(start_date)
+	print "Total expenses for this period: %s\n" %expenses
+	#text line - net amount for this interval: (income - expenses)
+	net_income = income - expenses
+	print "Net income for this period: %s" %(net_income)
+	getBalance(end_date)
+
 
 def menu3():
 	#intro string - gives accounting information for any chosen time interval
@@ -786,13 +818,7 @@ def menu3():
 	#produce graph for Expenses
 	graph("Expenses", expenses_input, EXPENSE_AMOUNT_FIELD, EXPENSE_TAG_FIELD)
 	
-	#starting account balance
-	start_balance = getBalance(start_date)
-	#text line - total income
-	#text line - total expenses
-	#text line - net amount for this interval: (income - expenses)
-	#ending account balance
-	summary()
+	accountSummary(start_date, end_date)
 	return
 
 def menu4():
@@ -825,7 +851,10 @@ def main():
 	#addActivity(campaign, camp_id)
 	
 	menu3()
-	#getBalance('2014-01-01')
+	#accountSummary('2014-01-01', '2014-01-01')
+	#date = '2014-01-01'
+	#getIncome(date)
+	#getExpenses(date)
 
 	cursor.close()
 	dbconn.close()
