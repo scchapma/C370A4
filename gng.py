@@ -946,7 +946,7 @@ def showCampaigns():
 	cursor.execute(sql)
 	rows = cursor.fetchall()
 	header = ["ID", "Name"]
-	printReport(rows, header)
+	printReport(header, rows)
 	return
 
 def showVolunteers():
