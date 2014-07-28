@@ -32,14 +32,15 @@ ACCT_VALUE_WIDTH = 10
 class Campaign:
 	'Base class for all campaigns'
 	
-	def __init__(self, name, start_date, end_date):
+	def __init__(self, name, start_date, end_date, memo):
 		self.name = name
 		self.start_date = start_date
 		self.end_date = end_date
+		self.memo = memo
 
 	def insertCampaign(self):
 		
-		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate) VALUES (%s, %s, %s)", [self.name, self.start_date, self.end_date])
+		cursor.execute("INSERT INTO Campaigns (name, startDate, endDate, memo) VALUES (%s, %s, %s, %s)", [self.name, self.start_date, self.end_date, self.memo])
 
 	def insertManager(self, campaign_id, employee_id):
 		
@@ -267,7 +268,7 @@ def addCampaign():
 	end_date = raw_input(end_date_str)
 	#check for proper format
 
-	campaign = Campaign(campaign_name, start_date, end_date)
+	campaign = Campaign(campaign_name, start_date, end_date, '')
 	
 	try:
 		campaign.insertCampaign()
@@ -961,7 +962,10 @@ def menu4():
 
 	menu4_choice = raw_input(intro_str)
 
-	if menu4_choice == '1':
+	if menu4_choice == '0':
+		return
+
+	elif menu4_choice == '1':
 		volunteerHistory()
 
 	elif menu4_choice == '2':
@@ -969,9 +973,6 @@ def menu4():
 
 	elif menu4_choice == '3':
 		print "choice #3\n"
-
-	elif menu4_choice == '0':
-		return
 
 	else:
 		print "improper input - return to menu.\n"
@@ -984,14 +985,13 @@ def menu5():
 
 def main():
 	
-	#startMenu()
+	startMenu()
 
 	#campaign = Campaign('Steve', '2014-02-24', '2014-03-17')
 	#camp_id = 5
 	#addActivity(campaign, camp_id)
 
-	menu4()
-	#volunteerHistory()
+	#menu4()
 
 	cursor.close()
 	dbconn.close()
