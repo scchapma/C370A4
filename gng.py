@@ -940,6 +940,18 @@ def volunteerHistory():
 		print "Error - could not return volunteer history.\n"
 	return
 
+def showCampaigns():
+	#try/except
+	sql = "Select id, name from Campaigns"
+	cursor.execute(sql)
+	rows = cursor.fetchall()
+	header = ["ID", "Name"]
+	printReport(rows, header)
+	return
+
+def showVolunteers():
+	return
+
 def addCampaignMemo():
 
 	#list campaigns by id, name
@@ -1037,9 +1049,15 @@ def menu4():
 		volunteerHistory()
 
 	elif menu4_choice == '2':
-		addCampaignMemo()
+		showCampaigns()
 
 	elif menu4_choice == '3':
+		showVolunteers()
+
+	elif menu4_choice == '4':
+		addCampaignMemo()
+
+	elif menu4_choice == '5':
 		addVolunteerMemo()
 
 	else:
