@@ -217,7 +217,8 @@ def menu1():
 
 					print "\n\tData for query %s:\n " %menu1_use_choice
 					#try: 
-					cursor.execute('select * from question%s', [menu1_use_choice])
+					sql = "Select * from question%s"
+					cursor.execute(sql, menu1_use_choice)
 					rows = cursor.fetchall()
 					header = []
 						#what if rows = 0?
