@@ -327,10 +327,12 @@ def addManager(campaign, camp_id):
 
 	no_manager_entered = True
 	os.system('clear')
+	count = 0
 	
 	while no_manager_entered:
 		
 		showEmployees()
+		manager_emp_id = None
 
 		manager_str = """
 		The campaign manager must be entered by employee number.
@@ -347,7 +349,9 @@ def addManager(campaign, camp_id):
 		except:
 			dbconn.rollback()
 			os.system('clear')
+			count += 1
 			print "\tInsert manager failed - please try again.\n"
+			print count
 
 	#confirm that manager correct
 	try:
