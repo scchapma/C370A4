@@ -93,7 +93,7 @@ def printReport(header, rows):
 			col_widths[x] += 1
 
 	#print header
-	header_str = ''
+	header_str = '\t'
 	count = 0
 	for x in range(0, len(col_widths)):
 		#center each header within header width	
@@ -104,11 +104,13 @@ def printReport(header, rows):
 	print header_str
 	
 	#print divider
-	print '-'*len(header_str)	
+	divider_str = '\t'
+	divider_str +='-'*len(header_str)
+	print divider_str	
 	
 	#print rows
 	for r in rows:
-		row_str = ''
+		row_str = '\t'
 		for x in range(0, len(col_widths)):
 			row_str += str(r[x]).ljust(col_widths[x])
 			row_str += '|'
@@ -174,8 +176,8 @@ def menu1():
 
 	intro_str = """\tPlease select a query from the following list: \n
 	Query menu: \n
-	1.   What employees and volunteers work on any campaign managed by Barry Basil (#E2)?
-	2.   What employees manage the campaigns that Gary Gold (#V1) works on?
+	1.   What volunteers (by ID number) work on any campaign managed by Barry Basil (#E2)?
+	2.   What employees (by ID number) manage the campaigns that Gary Gold (#V1) works on?
 	3.   What is the salary of the employee who manages the TsawassenTelephone campaign (#C3)?
 	4.   What are the IDs, names, start dates and end dates for each campaign that Harry Helium (#V2) works on?
 	5.   Which campaigns, if any, have only one activity?
@@ -215,7 +217,7 @@ def menu1():
 					
 					os.system('clear')
 
-					print "\n\tData for query %s:\n " %menu1_use_choice
+					print "\n\tAnswer for query %s:\n " %menu1_use_choice
 					try: 
 						sql = "Select * from question"
 						sql += menu1_use_choice
