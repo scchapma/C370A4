@@ -153,6 +153,7 @@ def startMenu():
 			input_flag = False
 
 		elif (main_menu_use_choice == str(4)):
+			os.system('clear')
 			menu4()	
 			input_flag = False
 
@@ -910,6 +911,8 @@ def menu3():
 
 def volunteerHistory():
 	
+	os.system('clear')
+
 	#return list of volunteers by id number
 	sql1 = "Select id from Volunteers"
 	cursor.execute(sql1)
@@ -925,15 +928,13 @@ def volunteerHistory():
 		name = names[0]
 		print "Report for %s\n" %name 
 
-		sql2 = "Select name, id, startdate, enddate  from Campaigns, (select campaign from VolunteerWorksOn where volunteer = %s) V1C where Campaigns.id = V1C.campaign"
-		cursor.execute(sql2, value_str)
+		#get campaigns
+		campaign_query = "Select name, id, startdate, enddate  from Campaigns, (select campaign from VolunteerWorksOn where volunteer = %s) V1C where Campaigns.id = V1C.campaign"
+		cursor.execute(campaign_query, value_str)
 		rows2 = cursor.fetchall()
 		header = ["Campaigns", "ID", "Start", "End"]
 		printReport(header, rows2) 	
 
-	#print rows
-	#iterate over volunteer number to return volMemo and campaign history (including campaign memo)
-	#print report for each volunteer and disply to user
 
 def addCampaignMemo():
 
@@ -948,15 +949,35 @@ def menu4():
 	#menu options - review volunteers, add memo to campaign or volunteer
 	#query - print out List of campaigns by volunteer
 
-	print "Gary Gold: \n"
+	intro_str = """\tPlease select an option from the following list: \n
+	
+	1.   Display volunteer history
+	2.   Add memo to campaign file 
+	3.   Add memo to volunteer file
+	  
+	Please enter your selection (a number between 1 and 3)
+	or exit by typing 0:\n	
+	"""	
 
-	sql = "Select name, id, startdate, enddate  from Campaigns, (select campaign from VolunteerWorksOn where volunteer = 1) V1C where Campaigns.id = V1C.campaign"
-	cursor.execute(sql)
-	rows = cursor.fetchall()
-	header = ["Campaigns", "ID", "Start", "End"]
-	printReport(header, rows) 
+	menu4_choice = raw_input(intro_str)
 
-	print menu4
+	if menu4_choice == '1':
+		volunteerHistory()
+
+	elif menu4_choice == '2':
+		print "choice #2\n"
+
+	elif menu4_choice == '3':
+		print "choice #3\n"
+
+	elif menu4_choice == '0':
+		return
+
+	else:
+		print "improper input - return to menu.\n"
+		return
+
+	return
 
 def menu5():
 	print menu5
@@ -969,8 +990,8 @@ def main():
 	#camp_id = 5
 	#addActivity(campaign, camp_id)
 
-	#menu4()
-	volunteerHistory()
+	menu4()
+	#volunteerHistory()
 
 	cursor.close()
 	dbconn.close()
