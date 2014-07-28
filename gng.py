@@ -942,19 +942,19 @@ def volunteerHistory():
 
 def showCampaigns():
 	#try/except
-	sql = "Select id, name from Campaigns group by id"
+	sql = "Select id, name, memo from Campaigns group by id"
 	cursor.execute(sql)
 	rows = cursor.fetchall()
-	header = ["ID", "Name"]
+	header = ["ID", "Name", "Memo"]
 	printReport(header, rows)
 	return
 
 def showVolunteers():
 	#try/except
-	sql = "Select id, name from Volunteers group by id"
+	sql = "Select id, name, memo from Volunteers group by id"
 	cursor.execute(sql)
 	rows = cursor.fetchall()
-	header = ["ID", "Name"]
+	header = ["ID", "Name", "Memo"]
 	printReport(header, rows)
 	return
 
