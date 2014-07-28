@@ -936,7 +936,7 @@ def volunteerHistory():
 			cursor.execute(name_query, value_str)
 			names = cursor.fetchall()
 			name = names[0]
-			print "Report for %s\n" %name 
+			print "\tReport for %s\n" %name 
 
 			#get campaigns
 			campaign_query = "Select name, id, startdate, enddate from Campaigns, (select campaign from VolunteerWorksOn where volunteer = %s) V1C where Campaigns.id = V1C.campaign"
@@ -950,7 +950,7 @@ def volunteerHistory():
 
 def showCampaigns():
 	
-	print "\n\n\nCampaign Summary:\n"
+	print "\n\n\n\tCampaign Summary:\n"
 	try:
 		sql = "Select id, name, memo from Campaigns order by id"
 		cursor.execute(sql)
@@ -963,7 +963,7 @@ def showCampaigns():
 
 def showVolunteers():
 	
-	print "\n\n\nVolunteer Summary:\n"
+	print "\n\n\n\tVolunteer Summary:\n"
 	try:
 		sql = "Select id, name, memo from Volunteers order by id"
 		cursor.execute(sql)
@@ -977,6 +977,7 @@ def showVolunteers():
 def addCampaignMemo():
 
 	#list campaigns by id, name
+	showCampaigns()
 	intro_str = """
 	Please select your desired campaign by ID number: \n
 	"""	
@@ -1013,6 +1014,8 @@ def addCampaignMemo():
 def addVolunteerMemo():
 
 	#list campaigns by id, name
+	showVolunteers()
+
 	intro_str = """
 	Please select your desired volunteer by ID number: \n
 	"""	
@@ -1059,7 +1062,7 @@ def menu4():
 		4.   Add/edit campaign memo
 		5.   Add/edit volunteer memo
 
-		Please enter your selection (a number between 1 and 3)
+		Please enter your selection (a number between 1 and 5)
 		or exit by typing 0:\n	
 		"""	
 
@@ -1089,20 +1092,23 @@ def menu4():
 			addVolunteerMemo()
 
 		else:
-			print "improper input - return to menu.\n"
-			return
-
-		menu_str = """
-		Press 1 to return to the last menu 
-		or any other key to exit the program: \n
-		"""
-
-		menu4_return_choice = raw_input(menu_str)
-		if menu4_return_choice == '1':
 			os.system('clear')
-		else:		
-			print "Exiting program.\n"
-			menu4_flag = False
+			print "Improper input - please try again.\n"
+		
+		if (menu4_choice == '1') or (menu4_choice == '2') or (menu4_choice == '3') or (menu4_choice == '4') or (menu4_choice == '5'):
+
+			menu_str = """
+			Press 1 to return to the last menu 
+			or any other key to exit the program: \n
+			"""
+
+			menu4_return_choice = raw_input(menu_str)
+			if menu4_return_choice == '1':
+				os.system('clear')
+			else:		
+				print "Exiting program.\n"
+				menu4_flag = False
+
 	return
 
 def menu5():
