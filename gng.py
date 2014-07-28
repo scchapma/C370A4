@@ -1019,12 +1019,17 @@ def menu4():
 	intro_str = """\tPlease select an option from the following list: \n
 	
 	1.   Display volunteer history
-	2.   Add memo to campaign file 
-	3.   Add memo to volunteer file
-	  
+	2.   Display campaign names and IDs
+	3.   Display volunteer names and IDs
+	4.   Add memo to campaign file
+	5.   Add memo to volunteer file
+
 	Please enter your selection (a number between 1 and 3)
 	or exit by typing 0:\n	
 	"""	
+
+	Add memo to campaign file 
+	3.   Add memo to volunteer file
 
 	menu4_choice = raw_input(intro_str)
 
