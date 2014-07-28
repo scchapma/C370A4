@@ -325,29 +325,35 @@ def addCampaign():
 
 def addManager(campaign, camp_id):
 
+	no_manager_entered = True
 	os.system('clear')
+	
+	while no_manager_entered:
+		
+		showEmployees()
 
-	manager_str = """
-	The campaign manager must be entered by employee number.
-	For instance, for Amy Arugula, you would enter '1'.
+		manager_str = """
+		The campaign manager must be entered by employee number.
+		For instance, for Amy Arugula, you would enter '1'.
 
-	Please enter employee number: \n
-	"""
-	manager_emp_id = raw_input(manager_str)
+		Please enter employee number: \n
+		"""
+		manager_emp_id = raw_input(manager_str)
 
-	#check to see that emp_id is within range - if not, exit
-	try:
-		campaign.insertManager(camp_id, int(manager_emp_id))
-	except:
-		dbconn.rollback()
-		print "Insert manager failed.\n"
-		return
+		#check to see that emp_id is within range - if not, exit
+		try:
+			campaign.insertManager(camp_id, int(manager_emp_id))
+			no_manager_entered = False
+		except:
+			dbconn.rollback()
+			os.system('clear')
+			print "\tInsert manager failed - please try again.\n"
 
 	#confirm that manager correct
 	try:
 		cursor.execute("select name from Employees, Manages where id=manager and campaign=%s", [camp_id])
 		manager_str = cursor.fetchall()
-		print 'Campaign manager: %s' %manager_str[0]
+		print '\n\tCampaign manager: %s' %manager_str[0]
 	except:
 		dbconn.rollback()
 		print "Error - could not print campaign manager.\n"
@@ -381,7 +387,7 @@ def confirmVolunteer():
 	vol_info = raw_input(vol_info_str)
 	if vol_info == 'y':
 		dbconn.commit()
-		print 'Changes committed.\n'
+		print '\tChanges committed.\n'
 	elif vol_info  == 'n':
 		dbconn.rollback()
 		print '\n\tVolunteer deleted - please start again.\n'
@@ -432,6 +438,9 @@ def newVolunteer(campaign, camp_id):
 		
 
 def oldVolunteer(campaign, camp_id):
+	
+	showVolunteers()
+
 	vol_str = """
 	The volunteer must be entered by existing volunteer number.
 	For instance, for Gary Gold, you would enter '1'.
@@ -451,7 +460,7 @@ def oldVolunteer(campaign, camp_id):
 		print "Insert volunteer failed - no such volunteer.\n"
 		return
 		
-	print 'Volunteer: %s' %old_vol_str[0]
+	print '\tVolunteer: %s' %old_vol_str[0]
 
 	confirmVolunteer()
 	return
@@ -467,7 +476,7 @@ def addAnotherVolunteer():
 	if vol_continue == 'y':
 		os.system('clear')
 	elif vol_continue == 'n':
-		print 'Exiting.\n'
+		#print 'Exiting.\n'
 		addVolunteerFlag = False
 	else:
 		print 'Improper input - exiting.\n'
@@ -987,6 +996,19 @@ def showVolunteers():
 		printReport(header, rows)
 	except:
 		print "Error - could not print list of volunteers.\n"
+	return
+
+def showEmployees():
+	
+	print "\n\n\n\tEmployee Summary:\n"
+	try:
+		sql = "Select id, name from Employees order by id"
+		cursor.execute(sql)
+		rows = cursor.fetchall()
+		header = ["ID", "Name"]
+		printReport(header, rows)
+	except:
+		print "Error - could not print list of employees.\n"
 	return
 
 def addCampaignMemo():
