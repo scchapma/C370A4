@@ -916,30 +916,64 @@ def volunteerHistory():
 
 	#return list of volunteers by id number
 	sql1 = "Select id from Volunteers"
-	cursor.execute(sql1)
-	rows = cursor.fetchall()
+	try:
+		cursor.execute(sql1)
+		rows = cursor.fetchall()
 
-	for r in rows:
-		value_str = str(r[0])
+		for r in rows:
+			value_str = str(r[0])
 
-		#get name
-		name_query = "Select name from Volunteers where id = %s"
-		cursor.execute(name_query, value_str)
-		names = cursor.fetchall()
-		name = names[0]
-		print "Report for %s\n" %name 
+			#get name
+			name_query = "Select name from Volunteers where id = %s"
+			cursor.execute(name_query, value_str)
+			names = cursor.fetchall()
+			name = names[0]
+			print "Report for %s\n" %name 
 
-		#get campaigns
-		campaign_query = "Select name, id, startdate, enddate  from Campaigns, (select campaign from VolunteerWorksOn where volunteer = %s) V1C where Campaigns.id = V1C.campaign"
-		cursor.execute(campaign_query, value_str)
-		rows2 = cursor.fetchall()
-		header = ["Campaigns", "ID", "Start", "End"]
-		printReport(header, rows2) 	
-
+			#get campaigns
+			campaign_query = "Select name, id, startdate, enddate from Campaigns, (select campaign from VolunteerWorksOn where volunteer = %s) V1C where Campaigns.id = V1C.campaign"
+			cursor.execute(campaign_query, value_str)
+			rows2 = cursor.fetchall()
+			header = ["Campaigns", "ID", "Start", "End"]
+			printReport(header, rows2) 	
+	except:
+		print "Error - could not return volunteer history.\n"
+	return
 
 def addCampaignMemo():
 
-	#prompt user to enter 
+	#list campaigns by id, name
+	intro_str = """
+	Please select your desired campaign by ID number: \n
+	"""	
+	camp_id_str = raw_input(intro_str)
+
+	memo_str = """
+	Please enter your memo (25 characters max): \n
+	"""
+	memo = raw_input(memo_str)
+
+	#try to update DB
+	try:
+		sql = "Update Campaigns set memo = %s where id = %s"
+		data = [memo, camp_id_str]
+		cursor.execute(sql, data)
+		sql = "Select id, name, memo from Campaigns where id = %s"
+		data = [camp_id_str]
+		cursor.execute(sql,data)
+		rows = cursor.fetchall()
+		if cursor.rowcount == 0:
+			print "Campaign ID does not exist.\n"
+			return
+		header = ['ID', 'Name', 'Memo']
+		printReport(header, rows)
+		dbconn.commit()
+	except:
+		dbconn.rollback()
+		print "Error - could not update campaign memo.\n"
+
+	#if invalid, will not update DB
+
 	return
 
 def addVolunteerMemo():
@@ -969,7 +1003,7 @@ def menu4():
 		volunteerHistory()
 
 	elif menu4_choice == '2':
-		print "choice #2\n"
+		addCampaignMemo()
 
 	elif menu4_choice == '3':
 		print "choice #3\n"
