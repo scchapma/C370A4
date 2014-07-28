@@ -565,16 +565,15 @@ def showActivity(activity_id):
 	rows = []
 	header = []
 	try:
-		cursor.execute("Select * from Activities where id=%s", [int(activity_id)])
+		cursor.execute("Select id, starttime, endtime, city, address, memo from Activities where id=%s", [int(activity_id)])
 		rows = cursor.fetchall()
 	except:
 		dbconn.rollback()
 		print "Print activity failed.\n"
 		return
 	if (cursor.rowcount > 0): 
-		for x in range(0, len(rows[0])):
-			header.append(cursor.description[x].name)
-		print "\n\tCurrent activity: \n"
+		header = ["ID", "Start Time", "End Time", "City", "Address", "Memo"]
+		print "\n\tActivities for this campaign: \n"
 		printReport(header, rows)
 	else:
 		print "No activity added.\n"
@@ -584,15 +583,14 @@ def showActivityList(camp_id):
 	rows = []
 	header = []
 	try:
-		cursor.execute('Select * from (Activities join Includes on id = activityid) where campaignid = %s', [int(camp_id)])
+		cursor.execute('Select id, starttime, endtime, city, address, memo from (Activities join Includes on id = activityid) where campaignid = %s', [int(camp_id)])
 		rows = cursor.fetchall()
 	except:
 		dbconn.rollback()
 		print "Print activity list failed.\n"
 		return
 	if (cursor.rowcount > 0): 
-		for x in range(0, len(rows[0])):
-			header.append(cursor.description[x].name)
+		header = ["ID", "Start Time", "End Time", "City", "Address", "Memo"]
 		print "\n\tActivities for this campaign: \n"
 		printReport(header, rows)
 	else:
