@@ -942,7 +942,7 @@ def volunteerHistory():
 
 def showCampaigns():
 	#try/except
-	sql = "Select id, name from Campaigns"
+	sql = "Select id, name from Campaigns group by id"
 	cursor.execute(sql)
 	rows = cursor.fetchall()
 	header = ["ID", "Name"]
@@ -950,6 +950,12 @@ def showCampaigns():
 	return
 
 def showVolunteers():
+	#try/except
+	sql = "Select id, name from Volunteers group by id"
+	cursor.execute(sql)
+	rows = cursor.fetchall()
+	header = ["ID", "Name"]
+	printReport(header, rows)
 	return
 
 def addCampaignMemo():
