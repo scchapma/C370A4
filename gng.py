@@ -978,6 +978,38 @@ def addCampaignMemo():
 
 def addVolunteerMemo():
 
+	#list campaigns by id, name
+	intro_str = """
+	Please select your desired volunteer by ID number: \n
+	"""	
+	vol_id_str = raw_input(intro_str)
+
+	memo_str = """
+	Please enter your memo (25 characters max): \n
+	"""
+	memo = raw_input(memo_str)
+
+	#try to update DB
+	try:
+		sql = "Update Volunteers set memo = %s where id = %s"
+		data = [memo, vol_id_str]
+		cursor.execute(sql, data)
+		sql = "Select id, name, memo from Volunteers where id = %s"
+		data = [vol_id_str]
+		cursor.execute(sql,data)
+		rows = cursor.fetchall()
+		if cursor.rowcount == 0:
+			print "Volunteer ID does not exist.\n"
+			return
+		header = ['ID', 'Name', 'Memo']
+		printReport(header, rows)
+		dbconn.commit()
+	except:
+		dbconn.rollback()
+		print "Error - could not update volunteer memo.\n"
+
+	#if invalid, will not update DB
+
 	return
 
 def menu4():
@@ -1006,7 +1038,7 @@ def menu4():
 		addCampaignMemo()
 
 	elif menu4_choice == '3':
-		print "choice #3\n"
+		addVolunteerMemo()
 
 	else:
 		print "improper input - return to menu.\n"
