@@ -941,21 +941,27 @@ def volunteerHistory():
 	return
 
 def showCampaigns():
-	#try/except
-	sql = "Select id, name, memo from Campaigns order by id"
-	cursor.execute(sql)
-	rows = cursor.fetchall()
-	header = ["ID", "Name", "Memo"]
-	printReport(header, rows)
+	
+	try:
+		sql = "Select id, name, memo from Campaigns order by id"
+		cursor.execute(sql)
+		rows = cursor.fetchall()
+		header = ["ID", "Name", "Memo"]
+		printReport(header, rows)
+	except:
+		print "Error - could not print list of campaigns.\n"
 	return
 
 def showVolunteers():
 	#try/except
-	sql = "Select id, name, memo from Volunteers order by id"
-	cursor.execute(sql)
-	rows = cursor.fetchall()
-	header = ["ID", "Name", "Memo"]
-	printReport(header, rows)
+	try:
+		sql = "Select id, name, memo from Volunteers order by id"
+		cursor.execute(sql)
+		rows = cursor.fetchall()
+		header = ["ID", "Name", "Memo"]
+		printReport(header, rows)
+	except:
+		print "Error - could not print list of volunteers.\n"
 	return
 
 def addCampaignMemo():
@@ -1032,41 +1038,44 @@ def addVolunteerMemo():
 
 def menu4():
 
-	intro_str = """\tPlease select an option from the following list: \n
-	
-	1.   Display volunteer history
-	2.   Display campaign names and IDs
-	3.   Display volunteer names and IDs
-	4.   Add/edit campaign memo
-	5.   Add/edit volunteer memo
+	menu4_flag = True
+	while menu4_flag:	
 
-	Please enter your selection (a number between 1 and 3)
-	or exit by typing 0:\n	
-	"""	
+		intro_str = """\tPlease select an option from the following list: \n
+		
+		1.   Display volunteer history
+		2.   Display campaign names and IDs
+		3.   Display volunteer names and IDs
+		4.   Add/edit campaign memo
+		5.   Add/edit volunteer memo
 
-	menu4_choice = raw_input(intro_str)
+		Please enter your selection (a number between 1 and 3)
+		or exit by typing 0:\n	
+		"""	
 
-	if menu4_choice == '0':
-		return
+		menu4_choice = raw_input(intro_str)
 
-	elif menu4_choice == '1':
-		volunteerHistory()
+		if menu4_choice == '0':
+			return
 
-	elif menu4_choice == '2':
-		showCampaigns()
+		elif menu4_choice == '1':
+			volunteerHistory()
 
-	elif menu4_choice == '3':
-		showVolunteers()
+		elif menu4_choice == '2':
+			showCampaigns()
 
-	elif menu4_choice == '4':
-		addCampaignMemo()
+		elif menu4_choice == '3':
+			showVolunteers()
 
-	elif menu4_choice == '5':
-		addVolunteerMemo()
+		elif menu4_choice == '4':
+			addCampaignMemo()
 
-	else:
-		print "improper input - return to menu.\n"
-		return
+		elif menu4_choice == '5':
+			addVolunteerMemo()
+
+		else:
+			print "improper input - return to menu.\n"
+			return
 
 	return
 
