@@ -700,7 +700,19 @@ def menu2():
 	
 def intro_menu3():
 	os.system('clear')
-	print "Welcome to menu 3 - accounting information.\n"
+	intro_str = """
+	Welcome to Menu 3.
+
+	This menu provides detailed accounting information for
+	any given time period.
+
+	Please input your desired start date and end date.
+
+	The program will return all donations and contributions for the given period.
+
+	The program will also return all expenses for the given period.
+	"""
+	print intro_str
 	return
 
 def graph(header, rows, amount_field, tag_field):
@@ -844,6 +856,9 @@ def accountSummary(start_date, end_date):
 	header_str += '\n'
 	print header_str
 	new_start_date = modifyDate(start_date)
+	if not new_start_date:
+		print "Error - malformed input - exiting.\n"
+		return
 	start_balance = getBalance(new_start_date)
 	printBalance(start_balance, start_date)
 
@@ -1108,7 +1123,6 @@ def menu4():
 			else:		
 				print "Exiting program.\n"
 				menu4_flag = False
-
 	return
 
 def menu5():
