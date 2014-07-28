@@ -942,7 +942,7 @@ def volunteerHistory():
 
 def showCampaigns():
 	#try/except
-	sql = "Select id, name, memo from Campaigns group by id"
+	sql = "Select id, name, memo from Campaigns order by id"
 	cursor.execute(sql)
 	rows = cursor.fetchall()
 	header = ["ID", "Name", "Memo"]
@@ -951,7 +951,7 @@ def showCampaigns():
 
 def showVolunteers():
 	#try/except
-	sql = "Select id, name, memo from Volunteers group by id"
+	sql = "Select id, name, memo from Volunteers order by id"
 	cursor.execute(sql)
 	rows = cursor.fetchall()
 	header = ["ID", "Name", "Memo"]
@@ -1031,8 +1031,6 @@ def addVolunteerMemo():
 	return
 
 def menu4():
-	#menu options - review volunteers, add memo to campaign or volunteer
-	#query - print out List of campaigns by volunteer
 
 	intro_str = """\tPlease select an option from the following list: \n
 	
@@ -1082,8 +1080,6 @@ def main():
 	#campaign = Campaign('Steve', '2014-02-24', '2014-03-17')
 	#camp_id = 5
 	#addActivity(campaign, camp_id)
-
-	#menu4()
 
 	cursor.close()
 	dbconn.close()
