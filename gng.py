@@ -1028,9 +1028,6 @@ def menu4():
 	or exit by typing 0:\n	
 	"""	
 
-	Add memo to campaign file 
-	3.   Add memo to volunteer file
-
 	menu4_choice = raw_input(intro_str)
 
 	if menu4_choice == '0':
