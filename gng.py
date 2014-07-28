@@ -1061,18 +1061,23 @@ def menu4():
 			return
 
 		elif menu4_choice == '1':
+			os.system('clear')
 			volunteerHistory()
 
 		elif menu4_choice == '2':
+			os.system('clear')
 			showCampaigns()
 
 		elif menu4_choice == '3':
+			os.system('clear')
 			showVolunteers()
 
 		elif menu4_choice == '4':
+			os.system('clear')
 			addCampaignMemo()
 
 		elif menu4_choice == '5':
+			os.system('clear')
 			addVolunteerMemo()
 
 		else:
