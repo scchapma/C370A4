@@ -1351,7 +1351,32 @@ def menu6():
 	Press '0' to exit.\n
 	"""
 
-	print intro_str
+	intro_choice = raw_input(intro_str)
+
+	if intro_choice == '0':
+		"\n\tExiting.\n"
+		return
+
+	elif intro_choice == '1':
+		#show campaigns
+		
+		#pick a campaign
+		#show volunteers
+		#pick a volunteer
+		#add volunteer to campaign - worksOn
+		#show volunteer list for campaign
+		return
+
+	elif intro_choice == '2':
+		#show campaigns
+		#pick a campaign
+		#show supporters
+		#pick a supporter
+		#convert the supporter into a volunteer
+		#add volunteer to campaign - worksOn
+		#show volunteer list for campaign
+		return
+
 	return
 
 
