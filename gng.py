@@ -942,6 +942,7 @@ def volunteerHistory():
 
 def showCampaigns():
 	
+	print "\n\n\nCampaign Summary:\n"
 	try:
 		sql = "Select id, name, memo from Campaigns order by id"
 		cursor.execute(sql)
@@ -953,7 +954,8 @@ def showCampaigns():
 	return
 
 def showVolunteers():
-	#try/except
+	
+	print "\n\n\nVolunteer Summary:\n"
 	try:
 		sql = "Select id, name, memo from Volunteers order by id"
 		cursor.execute(sql)
