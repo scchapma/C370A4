@@ -216,20 +216,20 @@ def menu1():
 					os.system('clear')
 
 					print "\n\tData for query %s:\n " %menu1_use_choice
-					#try: 
-					sql = "Select * from question"
-					sql += menu1_use_choice
-					cursor.execute(sql)
-					rows = cursor.fetchall()
-					header = []
+					try: 
+						sql = "Select * from question"
+						sql += menu1_use_choice
+						cursor.execute(sql)
+						rows = cursor.fetchall()
+						header = []
 						#what if rows = 0?
-					for x in range(0, len(rows[0])):
-						header.append(cursor.description[x].name)
-					printReport(header, rows)
-					input_flag = False
-					#except:
-						#dbconn.rollback()
-						#print "Error - could not return query.\n"
+						for x in range(0, len(rows[0])):
+							header.append(cursor.description[x].name)
+						printReport(header, rows)
+						input_flag = False
+					except:
+						dbconn.rollback()
+						print "Error - could not return query.\n"
 
 					#check to see if user wants to return to query menu
 					query_str = '\tDo you want to return to the query menu? (y/n)\n'
