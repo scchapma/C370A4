@@ -1339,7 +1339,21 @@ def menu6():
 	#menu: show volunteers, add new volunteer, update existing volunteer
 	#add new volunteer
 	#update - show volunteer chart
-	print menu6
+	intro_str = """
+	This option allows you to add a volunteer or supporter 
+	to an existing campaign.
+
+	Please make your selection from the following list:
+
+	1.   Add volunteer
+	2.   Add supporter
+
+	Press '0' to exit.\n
+	"""
+
+	print intro_str
+	return
+
 
 def main():
 	
