@@ -513,12 +513,6 @@ def showVolunteerList(campaign, camp_id):
 		dbconn.rollback()
 		print "Print volunteer list failed.\n"
 		return
-	#try/except
-	#if (cursor.rowcount > 0): 
-	#	for x in range(0, len(rows[0])):
-	#		header.append(cursor.description[x].name)
-	#	print "\n\tVolunteers for this campaign: \n"
-	#	printReport(header, rows)
 	if (cursor.rowcount > 0):
 		header = ["ID", "Name", "Start Date"]
 		print "\n\tVolunteers for this campaign: \n"
@@ -658,7 +652,7 @@ def addActivity(campaign, camp_id):
 	"""
 	query_choice = raw_input(query_str)
 	if query_choice == 'n':
-		print "Exiting - no activities added.\n"
+		print "Exiting - campaign complete - no activities added.\n"
 		return
 	elif query_choice == 'y':
 		os.system('clear')
