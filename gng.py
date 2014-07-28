@@ -1289,6 +1289,7 @@ def menu5():
 						dbconn.commit()
 						print "\tInformation saved.\n"
 						input_correct_flag = True
+						exit_flag = True
 					else:
 						os.system('clear')
 						print "\n\tInformation not saved - please try again.\n"
@@ -1322,6 +1323,7 @@ def menu5():
 						dbconn.commit()
 						print "\tInformation saved - exiting.\n"
 						input_correct_flag = True
+						exit_flag = True
 					else:
 						os.system('clear')
 						print "\n\tInformation not saved - please try again.\n"
