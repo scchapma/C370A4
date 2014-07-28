@@ -84,6 +84,7 @@ def printReport(header, rows):
 	#prepare list with baseline widths for header fields
 	col_widths = []
 
+
 	for item in header:
 		col_widths.append(len(item))
 	
@@ -188,8 +189,7 @@ def menu1():
 	Query menu: \n
 	1.   What volunteers (by ID number) work on any campaign managed by Barry Basil (#E2)?
 	2.   What employees (by ID number) manage the campaigns that Gary Gold (#V1) works on?
-	3.   What is the salary of the employee 
-who manages the TsawassenTelephone campaign (#C3)?
+	3.   What is the salary of the employee who manages the TsawassenTelephone campaign (#C3)?
 	4.   What are the IDs, names, start dates and end dates for each campaign that Harry Helium (#V2) works on?
 	5.   Which campaigns, if any, have only one activity?
 	6.   How much was the highest expense, and what was it for?	
@@ -220,8 +220,7 @@ who manages the TsawassenTelephone campaign (#C3)?
 				
 				elif (menu_value < 1 or menu_value> NUM_CHOICES):
 					error_str = """\n\tInteger entered out of range: \n
-	Please enter a number between 1 and 11 o
-r enter '0' to exit.\n
+	Please enter a number between 1 and 11 or enter '0' to exit.\n
 	"""
 					menu1_use_choice = raw_input(error_str)
 
@@ -1163,9 +1162,40 @@ def menu4():
 				menu4_flag = False
 	return
 
+def updatedCampaign(cursor, rows):
+
+	if cursor.rowcount == 0:
+		print "Campaign ID does not exist.\n"
+		return
+	header = ['ID', 'Name', 'Start Date', 'End Date', 'Memo']
+	print "\n\tUpdated name of Campaign: \n"
+	printReport(header, rows)
+
+def showCampaignSummary():
+	
+	print "\n\n\n\tCampaign Summary:\n"
+	try:
+		sql = "Select * from Campaigns order by id"
+		cursor.execute(sql)
+		rows = cursor.fetchall()
+		header = ["ID", "Name", "Start Date", "End Date", "Memo"]
+		printReport(header, rows)
+	except:
+		print "Error - could not print list of campaigns.\n"
+	return
+
+
+def confirmID(camp_choice):
+	sql = "Select id from Campaigns"
+	cursor.execute(sql)
+	rows = cursor.fetchall()
+
+	return
+
 def menu5():
 	#show campaigns
-	showCampaigns()
+	os.system('clear')
+	showCampaignSummary()
 
 	#select campaign by ID number
 	intro_str = """
@@ -1174,16 +1204,16 @@ def menu5():
 	camp_choice = raw_input(intro_str)
 
 	#confirm valid ID
+	confirmID(camp_choice)
 
 	#choose attribute to update
-	os.system('clear')
+	#os.system('clear')
 	menu_str = """
 	You can edit any of the following campaign attributes:
 	
 	1.    Name
 	2.    Start Date
 	3.    End Date
-	4.    Memo
 
 	Please enter the campaign attribute that you wish to edit:\n
 	"""
@@ -1192,40 +1222,108 @@ def menu5():
 	str_1 = "\n\tPlease enter the new campaign name (25 characters max):\n\n\t"
 	str_2 = "\n\tPlease enter the new start date (YYYY-MM-DD):\n\n\t"
 	str_3 = "\n\tPlease enter the new end date (YYYY-MM-DD):\n\n\t"
-	str_4 = "\n\tPlease enter a new memo (25 characters max):\n\n\t"
 
 	if (attribute_choice == '1'):
-		new_name = raw_input(str_1)
-		sql = "Update Campaigns set name = %s where id = %s"
-		data = [new_name, camp_choice]
-		cursor.execute(sql, data)
-		sql = "Select id, name from Campaigns where id = %s"
-		data = [camp_choice]
-		cursor.execute(sql,data)
-		rows = cursor.fetchall()
-		if cursor.rowcount == 0:
-			print "Campaign ID does not exist.\n"
-			return
-		header = ['ID', 'Name']
-		print "\n\tUpdated name of Campaign: \n"
-		printReport(header, rows)
-		#dbconn.commit()
-		#except:
-		#dbconn.rollback()
-		#print "Error - could not update campaign memo.\n"	
+
+		os.system('clear')
+		input_correct_flag = False
+		while input_correct_flag == False:
+			
+			new_name = raw_input(str_1)
+			try:
+				sql = "Update Campaigns set name = %s where id = %s"
+				data = [new_name, camp_choice]
+				cursor.execute(sql, data)
+				sql = "Select * from Campaigns where id = %s"
+				data = [camp_choice]
+				cursor.execute(sql,data)
+				rows = cursor.fetchall()
+				if cursor.rowcount == 0:
+					print "Campaign ID does not exist.\n"
+					return
+				header = ['ID', 'Name', 'Start Date', 'End Date', 'Memo']
+				print "\n\tUpdated Campaign: \n"
+				printReport(header, rows)
+				confirm_str = "\n\tIs this information correct? (y/n)\n\t"
+				confirm_choice = raw_input(confirm_str)
+				if confirm_choice =='y':
+					dbconn.commit()
+					print "\tInformation saved.\n"
+					input_correct_flag = True
+				else:
+					os.system('clear')
+					print "\n\tInformation not saved - please try again.\n"
+			except:
+				dbconn.rollback()
+				print "Error - could not update campaign name.\n"
 
 	elif (attribute_choice == '2'):
-		new_start_date = raw_input(str_2)
+		
+		os.system('clear')
+		input_correct_flag = False
+		while input_correct_flag == False:
+			new_start_date = raw_input(str_2)
+			try:
+				sql = "Update Campaigns set startDate = '%s' where id = %s" %(new_start_date, camp_choice)
+				data = [new_start_date, camp_choice]
+				cursor.execute(sql, data)
+				sql = "Select * from Campaigns where id = %s"
+				data = [camp_choice]
+				cursor.execute(sql,data)
+				rows = cursor.fetchall()
+				if cursor.rowcount == 0:
+					print "Campaign ID does not exist.\n"
+					return
+				header = ['ID', 'Name', 'Start Date', 'End Date', 'Memo']
+				print "\n\tUpdated Campaign: \n"
+				printReport(header, rows)
+				confirm_str = "\n\tIs this information correct? (y/n)\n\t"
+				confirm_choice = raw_input(confirm_str)
+				if confirm_choice =='y':
+					dbconn.commit()
+					print "\tInformation saved.\n"
+					input_correct_flag = True
+				else:
+					os.system('clear')
+					print "\n\tInformation not saved - please try again.\n"
+			except:
+				dbconn.rollback()
+				print "Error - could not update campaign start date.\n"	
 	
 	elif (attribute_choice == '3'):
-		new_end_date = raw_input(str_3)
+		
+		os.system('clear')
+		input_correct_flag = False
+		while input_correct_flag == False:
+			new_end_date = raw_input(str_2)
+			try:
+				sql = "Update Campaigns set endDate = '%s' where id = %s" %(new_end_date, camp_choice)
+				data = [new_end_date, camp_choice]
+				cursor.execute(sql, data)
+				sql = "Select * from Campaigns where id = %s"
+				data = [camp_choice]
+				cursor.execute(sql,data)
+				rows = cursor.fetchall()
+				if cursor.rowcount == 0:
+					print "Campaign ID does not exist.\n"
+					return
+				header = ['ID', 'Name', 'Start Date', 'End Date', 'Memo']
+				print "\n\tUpdated Campaign: \n"
+				printReport(header, rows)
+				confirm_str = "\n\tIs this information correct? (y/n)\n\t"
+				confirm_choice = raw_input(confirm_str)
+				if confirm_choice =='y':
+					dbconn.commit()
+					print "\tInformation saved - exiting.\n"
+					input_correct_flag = True
+				else:
+					os.system('clear')
+					print "\n\tInformation not saved - please try again.\n"
+			except:
+				dbconn.rollback()
+				print "Error - could not update campaign end date.\n"	
+
 	
-	elif (attribute_choice == '4'):
-		new_memo = raw_input(str_4)
-	
-	else:
-		"Improper input - exiting.\n"
-		return
 
 
 	
@@ -1235,7 +1333,7 @@ def menu5():
 	#add volunteers?
 	#add events?
 	#exit upon completion 
-	print menu5
+	return
 
 def menu6():
 	#menu: show volunteers, add new volunteer, update existing volunteer
