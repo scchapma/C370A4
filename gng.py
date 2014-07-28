@@ -1194,145 +1194,141 @@ def confirmID(camp_choice):
 
 def menu5():
 	#show campaigns
-	os.system('clear')
-	showCampaignSummary()
-
-	#select campaign by ID number
-	intro_str = """
-	Please enter the ID of the campaign you wish to edit:\n
-	"""
-	camp_choice = raw_input(intro_str)
-
-	#confirm valid ID
-	confirmID(camp_choice)
-
-	#choose attribute to update
-	#os.system('clear')
-	menu_str = """
-	You can edit any of the following campaign attributes:
 	
-	1.    Name
-	2.    Start Date
-	3.    End Date
-
-	Please enter the campaign attribute that you wish to edit:\n
-	"""
-	attribute_choice = raw_input(menu_str)
-
-	str_1 = "\n\tPlease enter the new campaign name (25 characters max):\n\n\t"
-	str_2 = "\n\tPlease enter the new start date (YYYY-MM-DD):\n\n\t"
-	str_3 = "\n\tPlease enter the new end date (YYYY-MM-DD):\n\n\t"
-
-	if (attribute_choice == '1'):
-
+	exit_flag = False
+	while exit_flag == False:
 		os.system('clear')
-		input_correct_flag = False
-		while input_correct_flag == False:
+		showCampaignSummary()
+
+		#select campaign by ID number
+		intro_str = """
+		Please enter the ID of the campaign you wish to edit:\n
+		"""
+		camp_choice = raw_input(intro_str)
+
+		#confirm valid ID
+		confirmID(camp_choice)
+
+		#choose attribute to update
+		#os.system('clear')
+		menu_str = """
+		You can edit any of the following campaign attributes:
+		
+		1.    Name
+		2.    Start Date
+		3.    End Date
+
+		Please enter the campaign attribute that you wish to edit:\n
+		"""
+		attribute_choice = raw_input(menu_str)
+
+		str_1 = "\n\tPlease enter the new campaign name (25 characters max):\n\n\t"
+		str_2 = "\n\tPlease enter the new start date (YYYY-MM-DD):\n\n\t"
+		str_3 = "\n\tPlease enter the new end date (YYYY-MM-DD):\n\n\t"
+
+		if (attribute_choice == '1'):
+
+			os.system('clear')
+			input_correct_flag = False
+			while input_correct_flag == False:
+				
+				new_name = raw_input(str_1)
+				try:
+					sql = "Update Campaigns set name = %s where id = %s"
+					data = [new_name, camp_choice]
+					cursor.execute(sql, data)
+					sql = "Select * from Campaigns where id = %s"
+					data = [camp_choice]
+					cursor.execute(sql,data)
+					rows = cursor.fetchall()
+					if cursor.rowcount == 0:
+						print "Campaign ID does not exist.\n"
+						return
+					header = ['ID', 'Name', 'Start Date', 'End Date', 'Memo']
+					print "\n\tUpdated Campaign: \n"
+					printReport(header, rows)
+					confirm_str = "\n\tIs this information correct? (y/n)\n\t"
+					confirm_choice = raw_input(confirm_str)
+					if confirm_choice =='y':
+						dbconn.commit()
+						print "\tInformation saved.\n"
+						input_correct_flag = True
+						exit_flag = True
+					else:
+						os.system('clear')
+						print "\n\tInformation not saved - please try again.\n"
+				except:
+					dbconn.rollback()
+					print "Error - could not update campaign name.\n"
+
+		elif (attribute_choice == '2'):
 			
-			new_name = raw_input(str_1)
-			try:
-				sql = "Update Campaigns set name = %s where id = %s"
-				data = [new_name, camp_choice]
-				cursor.execute(sql, data)
-				sql = "Select * from Campaigns where id = %s"
-				data = [camp_choice]
-				cursor.execute(sql,data)
-				rows = cursor.fetchall()
-				if cursor.rowcount == 0:
-					print "Campaign ID does not exist.\n"
-					return
-				header = ['ID', 'Name', 'Start Date', 'End Date', 'Memo']
-				print "\n\tUpdated Campaign: \n"
-				printReport(header, rows)
-				confirm_str = "\n\tIs this information correct? (y/n)\n\t"
-				confirm_choice = raw_input(confirm_str)
-				if confirm_choice =='y':
-					dbconn.commit()
-					print "\tInformation saved.\n"
-					input_correct_flag = True
-				else:
-					os.system('clear')
-					print "\n\tInformation not saved - please try again.\n"
-			except:
-				dbconn.rollback()
-				print "Error - could not update campaign name.\n"
-
-	elif (attribute_choice == '2'):
+			os.system('clear')
+			input_correct_flag = False
+			while input_correct_flag == False:
+				new_start_date = raw_input(str_2)
+				try:
+					sql = "Update Campaigns set startDate = '%s' where id = %s" %(new_start_date, camp_choice)
+					data = [new_start_date, camp_choice]
+					cursor.execute(sql, data)
+					sql = "Select * from Campaigns where id = %s"
+					data = [camp_choice]
+					cursor.execute(sql,data)
+					rows = cursor.fetchall()
+					if cursor.rowcount == 0:
+						print "Campaign ID does not exist.\n"
+						return
+					header = ['ID', 'Name', 'Start Date', 'End Date', 'Memo']
+					print "\n\tUpdated Campaign: \n"
+					printReport(header, rows)
+					confirm_str = "\n\tIs this information correct? (y/n)\n\t"
+					confirm_choice = raw_input(confirm_str)
+					if confirm_choice =='y':
+						dbconn.commit()
+						print "\tInformation saved.\n"
+						input_correct_flag = True
+					else:
+						os.system('clear')
+						print "\n\tInformation not saved - please try again.\n"
+				except:
+					dbconn.rollback()
+					print "Error - could not update campaign start date.\n"	
 		
-		os.system('clear')
-		input_correct_flag = False
-		while input_correct_flag == False:
-			new_start_date = raw_input(str_2)
-			try:
-				sql = "Update Campaigns set startDate = '%s' where id = %s" %(new_start_date, camp_choice)
-				data = [new_start_date, camp_choice]
-				cursor.execute(sql, data)
-				sql = "Select * from Campaigns where id = %s"
-				data = [camp_choice]
-				cursor.execute(sql,data)
-				rows = cursor.fetchall()
-				if cursor.rowcount == 0:
-					print "Campaign ID does not exist.\n"
-					return
-				header = ['ID', 'Name', 'Start Date', 'End Date', 'Memo']
-				print "\n\tUpdated Campaign: \n"
-				printReport(header, rows)
-				confirm_str = "\n\tIs this information correct? (y/n)\n\t"
-				confirm_choice = raw_input(confirm_str)
-				if confirm_choice =='y':
-					dbconn.commit()
-					print "\tInformation saved.\n"
-					input_correct_flag = True
-				else:
-					os.system('clear')
-					print "\n\tInformation not saved - please try again.\n"
-			except:
-				dbconn.rollback()
-				print "Error - could not update campaign start date.\n"	
-	
-	elif (attribute_choice == '3'):
-		
-		os.system('clear')
-		input_correct_flag = False
-		while input_correct_flag == False:
-			new_end_date = raw_input(str_2)
-			try:
-				sql = "Update Campaigns set endDate = '%s' where id = %s" %(new_end_date, camp_choice)
-				data = [new_end_date, camp_choice]
-				cursor.execute(sql, data)
-				sql = "Select * from Campaigns where id = %s"
-				data = [camp_choice]
-				cursor.execute(sql,data)
-				rows = cursor.fetchall()
-				if cursor.rowcount == 0:
-					print "Campaign ID does not exist.\n"
-					return
-				header = ['ID', 'Name', 'Start Date', 'End Date', 'Memo']
-				print "\n\tUpdated Campaign: \n"
-				printReport(header, rows)
-				confirm_str = "\n\tIs this information correct? (y/n)\n\t"
-				confirm_choice = raw_input(confirm_str)
-				if confirm_choice =='y':
-					dbconn.commit()
-					print "\tInformation saved - exiting.\n"
-					input_correct_flag = True
-				else:
-					os.system('clear')
-					print "\n\tInformation not saved - please try again.\n"
-			except:
-				dbconn.rollback()
-				print "Error - could not update campaign end date.\n"	
-
-	
-
-
-	
-	#show updated campaign
-	#confirm correct
-	#if not correct, start over
-	#add volunteers?
-	#add events?
-	#exit upon completion 
+		elif (attribute_choice == '3'):
+			
+			os.system('clear')
+			input_correct_flag = False
+			while input_correct_flag == False:
+				new_end_date = raw_input(str_2)
+				try:
+					sql = "Update Campaigns set endDate = '%s' where id = %s" %(new_end_date, camp_choice)
+					data = [new_end_date, camp_choice]
+					cursor.execute(sql, data)
+					sql = "Select * from Campaigns where id = %s"
+					data = [camp_choice]
+					cursor.execute(sql,data)
+					rows = cursor.fetchall()
+					if cursor.rowcount == 0:
+						print "Campaign ID does not exist.\n"
+						return
+					header = ['ID', 'Name', 'Start Date', 'End Date', 'Memo']
+					print "\n\tUpdated Campaign: \n"
+					printReport(header, rows)
+					confirm_str = "\n\tIs this information correct? (y/n)\n\t"
+					confirm_choice = raw_input(confirm_str)
+					if confirm_choice =='y':
+						dbconn.commit()
+						print "\tInformation saved - exiting.\n"
+						input_correct_flag = True
+					else:
+						os.system('clear')
+						print "\n\tInformation not saved - please try again.\n"
+				except:
+					dbconn.rollback()
+					print "Error - could not update campaign end date.\n"
+		else:
+			print "\n\tImproper input - please enter a valid attribute number.\n"	
+	print "\n\tExiting.\n"		
 	return
 
 def menu6():
