@@ -1165,8 +1165,70 @@ def menu4():
 
 def menu5():
 	#show campaigns
+	showCampaigns()
+
 	#select campaign by ID number
+	intro_str = """
+	Please enter the ID of the campaign you wish to edit:\n
+	"""
+	camp_choice = raw_input(intro_str)
+
+	#confirm valid ID
+
 	#choose attribute to update
+	os.system('clear')
+	menu_str = """
+	You can edit any of the following campaign attributes:
+	
+	1.    Name
+	2.    Start Date
+	3.    End Date
+	4.    Memo
+
+	Please enter the campaign attribute that you wish to edit:\n
+	"""
+	attribute_choice = raw_input(menu_str)
+
+	str_1 = "\n\tPlease enter the new campaign name (25 characters max):\n\n\t"
+	str_2 = "\n\tPlease enter the new start date (YYYY-MM-DD):\n\n\t"
+	str_3 = "\n\tPlease enter the new end date (YYYY-MM-DD):\n\n\t"
+	str_4 = "\n\tPlease enter a new memo (25 characters max):\n\n\t"
+
+	if (attribute_choice == '1'):
+		new_name = raw_input(str_1)
+		sql = "Update Campaigns set name = %s where id = %s"
+		data = [new_name, camp_choice]
+		cursor.execute(sql, data)
+		sql = "Select id, name from Campaigns where id = %s"
+		data = [camp_choice]
+		cursor.execute(sql,data)
+		rows = cursor.fetchall()
+		if cursor.rowcount == 0:
+			print "Campaign ID does not exist.\n"
+			return
+		header = ['ID', 'Name']
+		print "\n\tUpdated name of Campaign: \n"
+		printReport(header, rows)
+		#dbconn.commit()
+		#except:
+		#dbconn.rollback()
+		#print "Error - could not update campaign memo.\n"	
+
+	elif (attribute_choice == '2'):
+		new_start_date = raw_input(str_2)
+	
+	elif (attribute_choice == '3'):
+		new_end_date = raw_input(str_3)
+	
+	elif (attribute_choice == '4'):
+		new_memo = raw_input(str_4)
+	
+	else:
+		"Improper input - exiting.\n"
+		return
+
+
+	
 	#show updated campaign
 	#confirm correct
 	#if not correct, start over
