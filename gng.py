@@ -1084,6 +1084,17 @@ def menu4():
 			print "improper input - return to menu.\n"
 			return
 
+		menu_str = """
+		Press 1 to return to the last menu 
+		or any other key to exit the program: \n
+		"""
+
+		menu4_return_choice = raw_input(menu_str)
+		if menu4_return_choice == '1':
+			os.system('clear')
+		else:		
+			print "Exiting program.\n"
+			menu4_flag = False
 	return
 
 def menu5():
