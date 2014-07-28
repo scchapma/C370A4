@@ -872,10 +872,14 @@ def accountSummary(start_date, end_date):
 	return
 
 def modifyDate(start_date):
-	Date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-	EndDate = Date - datetime.timedelta(days=1)
-	end_date = EndDate.strftime("%Y-%m-%d")
-	return end_date
+	try:
+		Date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+		EndDate = Date - datetime.timedelta(days=1)
+		end_date = EndDate.strftime("%Y-%m-%d")
+		return end_date
+	except:
+		print "Error - improper format for entered date.\n"
+		return
 
 def menu3():
 	#intro string - gives accounting information for any chosen time interval
