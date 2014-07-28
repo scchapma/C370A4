@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+#Summer 2014 - CSC 370 - Assignment #4
+#Steve Chapman (#V00190898)
+#Database application for "Green-Not-Greed"
+
 import psycopg2
 import psycopg2.errorcodes
 from psycopg2 import Date
@@ -79,6 +83,7 @@ def printReport(header, rows):
 	
 	#prepare list with baseline widths for header fields
 	col_widths = []
+
 	for item in header:
 		col_widths.append(len(item))
 	
@@ -130,8 +135,9 @@ def startMenu():
 	2.  Set up new campaign
 	3.  Accounting
 	4.  Membership history
-	5.  Phase 5 - *under development*\n  
-	Please enter your selection (a number between 1 and 5):\n	
+	5.  Edit existing campaign
+	6.  Supporters\n  
+	Please enter your selection (a number between 1 and 6):\n	
 	"""	
 	
 	main_menu_use_choice = raw_input(intro_str)
@@ -163,6 +169,10 @@ def startMenu():
 		elif (main_menu_use_choice == str(5)):
 			menu5()	
 			input_flag = False
+
+		elif (main_menu_use_choice == str(6)):
+			menu6()	
+			input_flag = False
 	
 		else: 
 			error_str = """\n\tEntered value out of range: \n
@@ -178,7 +188,8 @@ def menu1():
 	Query menu: \n
 	1.   What volunteers (by ID number) work on any campaign managed by Barry Basil (#E2)?
 	2.   What employees (by ID number) manage the campaigns that Gary Gold (#V1) works on?
-	3.   What is the salary of the employee who manages the TsawassenTelephone campaign (#C3)?
+	3.   What is the salary of the employee 
+who manages the TsawassenTelephone campaign (#C3)?
 	4.   What are the IDs, names, start dates and end dates for each campaign that Harry Helium (#V2) works on?
 	5.   Which campaigns, if any, have only one activity?
 	6.   How much was the highest expense, and what was it for?	
@@ -209,7 +220,8 @@ def menu1():
 				
 				elif (menu_value < 1 or menu_value> NUM_CHOICES):
 					error_str = """\n\tInteger entered out of range: \n
-	Please enter a number between 1 and 11 or enter '0' to exit.\n
+	Please enter a number between 1 and 11 o
+r enter '0' to exit.\n
 	"""
 					menu1_use_choice = raw_input(error_str)
 
@@ -517,12 +529,12 @@ def addVolunteer(campaign, camp_id):
 	"""
 	query_choice = raw_input(query_str)
 	if query_choice == 'n':
-		print "Exiting - no volunteers added.\n"
+		print "\n\tNo volunteers added.\n"
 		return
 	elif query_choice == 'y':
 		os.system('clear')
 	else:
-		print "Exiting - improper input.\n"	
+		print "\n\tExiting - improper input.\n"	
 		return
 
 	while (addVolunteerFlag):
@@ -1152,7 +1164,22 @@ def menu4():
 	return
 
 def menu5():
+	#show campaigns
+	#select campaign by ID number
+	#choose attribute to update
+	#show updated campaign
+	#confirm correct
+	#if not correct, start over
+	#add volunteers?
+	#add events?
+	#exit upon completion 
 	print menu5
+
+def menu6():
+	#menu: show volunteers, add new volunteer, update existing volunteer
+	#add new volunteer
+	#update - show volunteer chart
+	print menu6
 
 def main():
 	
