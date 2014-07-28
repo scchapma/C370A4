@@ -188,8 +188,7 @@ def menu1():
 	Query menu: \n
 	1.   What volunteers (by ID number) work on any campaign managed by Barry Basil (#E2)?
 	2.   What employees (by ID number) manage the campaigns that Gary Gold (#V1) works on?
-	3.   What is the salary of the employee 
-who manages the TsawassenTelephone campaign (#C3)?
+	3.   What is the salary of the employee who manages the TsawassenTelephone campaign (#C3)?
 	4.   What are the IDs, names, start dates and end dates for each campaign that Harry Helium (#V2) works on?
 	5.   Which campaigns, if any, have only one activity?
 	6.   How much was the highest expense, and what was it for?	
@@ -220,8 +219,7 @@ who manages the TsawassenTelephone campaign (#C3)?
 				
 				elif (menu_value < 1 or menu_value> NUM_CHOICES):
 					error_str = """\n\tInteger entered out of range: \n
-	Please enter a number between 1 and 11 o
-r enter '0' to exit.\n
+	Please enter a number between 1 and 11 or enter '0' to exit.\n
 	"""
 					menu1_use_choice = raw_input(error_str)
 
@@ -252,6 +250,7 @@ r enter '0' to exit.\n
 					if query_choice == 'y':
 						input_flag = False
 					else:
+						print "\n\tExiting.\n"
 						query_flag = False
 						return
 			else:
@@ -347,7 +346,11 @@ def addManager(campaign, camp_id):
 		manager_emp_id = None
 
 		manager_str = """
-		The campaign manager must be entered by employee number.
+		Your campaign needs a campaign manager.
+		
+		The campaign manager must be an employee of GNG.
+
+		Please enter the campaign manager by employee ID:The campaign manager must be entered by employee number.
 		For instance, for Amy Arugula, you would enter '1'.
 
 		Please enter employee number: \n
@@ -504,15 +507,20 @@ def showVolunteerList(campaign, camp_id):
 	rows = []
 	header = []
 	try:
-		cursor.execute('Select * from (Volunteers join VolunteerWorksOn on id = volunteer) where campaign = %s', [int(camp_id)])
+		cursor.execute('Select id, name, memo from (Volunteers join VolunteerWorksOn on id = volunteer) where campaign = %s', [int(camp_id)])
 		rows = cursor.fetchall()
 	except:
 		dbconn.rollback()
 		print "Print volunteer list failed.\n"
 		return
-	if (cursor.rowcount > 0): 
-		for x in range(0, len(rows[0])):
-			header.append(cursor.description[x].name)
+	#try/except
+	#if (cursor.rowcount > 0): 
+	#	for x in range(0, len(rows[0])):
+	#		header.append(cursor.description[x].name)
+	#	print "\n\tVolunteers for this campaign: \n"
+	#	printReport(header, rows)
+	if (cursor.rowcount > 0):
+		header = ["ID", "Name", "Start Date"]
 		print "\n\tVolunteers for this campaign: \n"
 		printReport(header, rows)
 	else:
