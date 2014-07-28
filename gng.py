@@ -1037,8 +1037,8 @@ def menu4():
 	1.   Display volunteer history
 	2.   Display campaign names and IDs
 	3.   Display volunteer names and IDs
-	4.   Add memo to campaign file
-	5.   Add memo to volunteer file
+	4.   Add/edit campaign memo
+	5.   Add/edit volunteer memo
 
 	Please enter your selection (a number between 1 and 3)
 	or exit by typing 0:\n	
