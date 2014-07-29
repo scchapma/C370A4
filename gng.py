@@ -144,7 +144,7 @@ def startMenu():
 	main_menu_use_choice = raw_input(intro_str)
 	input_flag = True
 
-	while (input_flag):
+	while (input_flag == True):
 
 		if (main_menu_use_choice == str(0)):
 			return
@@ -252,14 +252,15 @@ def menu1():
 						input_flag = False
 					else:
 						print "\n\tExiting.\n"
+						input_flag = False
 						query_flag = False
-						return
+						#return
 			else:
 				error_str = """\n\tMalformed input: \n
 	Please enter a number between 1 and 11 or enter '0' to exit.\n
 	"""
 				menu1_use_choice = raw_input(error_str)
-	return
+	#return
 		
 
 def addCampaign():
