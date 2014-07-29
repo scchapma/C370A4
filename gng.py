@@ -1015,6 +1015,19 @@ def showVolunteers():
 		print "Error - could not print list of volunteers.\n"
 	return
 
+def showSupporters():
+	
+	print "\n\n\n\tSupporter Summary:\n"
+	try:
+		sql = "Select id, name from Supporters order by id"
+		cursor.execute(sql)
+		rows = cursor.fetchall()
+		header = ["ID", "Name"]
+		printReport(header, rows)
+	except:
+		print "Error - could not print list of supporters.\n"
+	return
+
 def showEmployees():
 	
 	print "\n\n\n\tEmployee Summary:\n"
@@ -1340,15 +1353,35 @@ def showVolunteersByCampaign(camp_id):
 	#os.system('clear')
 
 	#return list of volunteers by id number
+	try:
+		sql = "Select id, name from Volunteers, VolunteerWorksOn where (volunteer = id) and (campaign=%s)"
+		data = [camp_id]
+		cursor.execute(sql, data)
+		rows = cursor.fetchall()
+		header = ["ID", "Volunteer Name"]
+		printReport(header, rows)
+	except:
+		print "Error - could not return campaign's volunteer list.\n"
+	return
 
-	sql = "Select id, name from Volunteers, VolunteerWorksOn where (volunteer = id) and (campaign=%s)"
-	data = [camp_id]
-	cursor.execute(sql, data)
-	rows = cursor.fetchall()
-	header = ["ID", "Volunteer Name"]
-	printReport(header, rows)
-	#except:
-	#	print "Error - could not return volunteer history.\n"
+def convertToVolunteer(vol_id):
+	#cursor.execute("INSERT INTO Volunteers (name, startDate, seniorVolunteer) VALUES (%s, %s, False)", [vol_name, vol_start_date])
+	try:
+		sql = "Select name from Supporters where id=%s"
+		data = [vol_id]
+		cursor.execute(sql, data)
+		rows = cursor.fetchall()
+		vol_name = rows[0][0]
+		sql = "Insert into Volunteers (name, startDate, seniorVolunteer) values (%s, '2014-01-01', False)"
+		data = [vol_name]
+		cursor.execute(sql, data)
+		dbconn.commit()
+		cursor.execute("Select id from Volunteers where name=%s", [vol_name])
+		row = cursor.fetchall()
+		vol_id = int(row[0][0])
+		return vol_id
+	except:
+		print "\n\tError - could not convert support to volunteer.\n"
 	return
 
 def menu6():
@@ -1386,23 +1419,48 @@ def menu6():
 		vol_choice = raw_input(vol_str)
 		#add volunteer to campaign - worksOn
 		#add check to see if volunteer already works on campaign 
-		sql = "Insert into VolunteerWorksOn (campaign, volunteer) values (%s, %s)"
-		data = [int(camp_choice), int(vol_choice)]
-		cursor.execute(sql, data)
-		dbconn.commit()
+		try:
+			sql = "Insert into VolunteerWorksOn (campaign, volunteer) values (%s, %s)"
+			data = [int(camp_choice), int(vol_choice)]
+			cursor.execute(sql, data)
+			dbconn.commit()
+		except:
+			print "\n\tError: could not insert volunteer.\n"
+			print "\n\tExiting.\n"
 		#show volunteer list for campaign
 		print "\n\tUpdated Campaign Volunteers:\n"
 		showVolunteersByCampaign(camp_choice)
+		print "\n\tExiting.\n"
 		return
 
 	elif intro_choice == '2':
 		#show campaigns
+		showCampaigns()
 		#pick a campaign
-		#show supporters
+		camp_str = "\n\tSelect a campaign by campaign ID: \n\t"
+		camp_choice = raw_input(camp_str)
+		#show supporter
+		showSupporters()
 		#pick a supporter
-		#convert the supporter into a volunteer
+		sup_str = "\n\tSelect a supporter by supporter ID: \n\t"
+		sup_choice = raw_input(sup_str)
+		vol_id = convertToVolunteer(sup_choice)
+		#get new vol_id #
+
 		#add volunteer to campaign - worksOn
+		#add check to see if volunteer already works on campaign 
+		try:
+			sql = "Insert into VolunteerWorksOn (campaign, volunteer) values (%s, %s)"
+			data = [int(camp_choice), int(vol_id)]
+			cursor.execute(sql, data)
+			dbconn.commit()
+		except:
+			print "\n\tError: could not insert supporter.\n"
+			print "\n\tExiting.\n"
 		#show volunteer list for campaign
+		print "\n\tUpdated Campaign Volunteers:\n"
+		showVolunteersByCampaign(camp_choice)
+		print "\n\tExiting.\n"
 		return
 
 	return
