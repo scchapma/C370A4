@@ -1414,6 +1414,8 @@ def menu6():
 		camp_str = "\n\tSelect a campaign by campaign ID: \n\t"
 		camp_choice = raw_input(camp_str)
 		#show volunteers
+		print "\n\tCampaign Volunteers:\n"
+		showVolunteersByCampaign(camp_choice)
 		showVolunteers()
 		#pick a volunteer
 		vol_str = "\n\tSelect a volunteer by volunteer ID: \n\t"
@@ -1442,7 +1444,7 @@ def menu6():
 		camp_choice = raw_input(camp_str)
 		#show supporter
 		print "\n\tCampaign Volunteers:\n"
-		showVolunteersByCampaign()
+		showVolunteersByCampaign(camp_choice)
 		showSupporters()
 		#pick a supporter
 		sup_str = "\n\tSelect a supporter by supporter ID: \n\t"
