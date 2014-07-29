@@ -151,7 +151,7 @@ def startMenu():
 
 		elif (main_menu_use_choice == str(1)):
 			menu1()
-			#input_flag = False
+			input_flag = False
 			
 		elif (main_menu_use_choice == str(2)):
 			os.system('clear')		
@@ -1441,6 +1441,8 @@ def menu6():
 		camp_str = "\n\tSelect a campaign by campaign ID: \n\t"
 		camp_choice = raw_input(camp_str)
 		#show supporter
+		print "\n\tCampaign Volunteers:\n"
+		showVolunteersByCampaign()
 		showSupporters()
 		#pick a supporter
 		sup_str = "\n\tSelect a supporter by supporter ID: \n\t"
