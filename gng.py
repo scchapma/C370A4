@@ -151,7 +151,7 @@ def startMenu():
 
 		elif (main_menu_use_choice == str(1)):
 			menu1()
-			#input_flag = False
+			input_flag = False
 			
 		elif (main_menu_use_choice == str(2)):
 			os.system('clear')		
