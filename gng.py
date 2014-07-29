@@ -1335,6 +1335,22 @@ def menu5():
 	print "\n\tExiting.\n"		
 	return
 
+def showVolunteersByCampaign(camp_id):
+
+	#os.system('clear')
+
+	#return list of volunteers by id number
+
+	sql = "Select id, name from Volunteers, VolunteerWorksOn where (volunteer = id) and (campaign=%s)"
+	data = [camp_id]
+	cursor.execute(sql, data)
+	rows = cursor.fetchall()
+	header = ["ID", "Volunteer Name"]
+	printReport(header, rows)
+	#except:
+	#	print "Error - could not return volunteer history.\n"
+	return
+
 def menu6():
 	#menu: show volunteers, add new volunteer, update existing volunteer
 	#add new volunteer
@@ -1359,12 +1375,24 @@ def menu6():
 
 	elif intro_choice == '1':
 		#show campaigns
-		
+		showCampaigns()
 		#pick a campaign
+		camp_str = "\n\tSelect a campaign by campaign ID: \n\t"
+		camp_choice = raw_input(camp_str)
 		#show volunteers
+		showVolunteers()
 		#pick a volunteer
+		vol_str = "\n\tSelect a volunteer by volunteer ID: \n\t"
+		vol_choice = raw_input(vol_str)
 		#add volunteer to campaign - worksOn
+		#add check to see if volunteer already works on campaign 
+		sql = "Insert into VolunteerWorksOn (campaign, volunteer) values (%s, %s)"
+		data = [int(camp_choice), int(vol_choice)]
+		cursor.execute(sql, data)
+		dbconn.commit()
 		#show volunteer list for campaign
+		print "\n\tUpdated Campaign Volunteers:\n"
+		showVolunteersByCampaign(camp_choice)
 		return
 
 	elif intro_choice == '2':
